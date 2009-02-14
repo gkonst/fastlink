@@ -1,6 +1,8 @@
 import time
+import os
 
-from pydelicious import DeliciousAPI
+import pydelicious
+from pydelicious import DeliciousAPI, DLCS_WAIT_TIME
 
 from dao import DAO
 from util import log
@@ -14,6 +16,8 @@ class Cache(object):
         self.dao = DAO()
         self.username = username
         self.password = password
+        pydelicious.DEBUG = 1
+        pydelicious.Waiter = _FileWaiter(DLCS_WAIT_TIME, "pydelicious.stamp")       
         self.api = DeliciousAPI(self.username, self.password)
         log.debug("opening cache...Ok")
     
@@ -44,9 +48,60 @@ class Cache(object):
     def _update_last_sync(self):
         self.dao.update_last_sync(time.time())
 
+class _FileWaiter:
+    """Waiter makes sure a certain amount of time passes between
+    successive calls of `Waiter()`.
+
+    Some attributes:
+    :last: time of last call
+    :wait: the minimum time needed between calls
+    :waited: the number of calls throttled
+
+    pydelicious.Waiter is an instance created when the module is loaded.
+    """
+    def __init__(self, wait, stamp_file):
+        self.wait = wait
+        self.waited = 0
+        if not os.path.exists(stamp_file):
+            if pydelicious.DEBUG>0: print "Creating stamp in : ", stamp_file 
+            fin = open(stamp_file, "wt")
+            fin = open(stamp_file, "rt")
+        else:
+            if pydelicious.DEBUG>0: print "Using stamp in : ", stamp_file
+            fin = open(stamp_file, "rt")
+        content = fin.read()
+        if not content:
+            self.lastcall = 0
+            fin = open(stamp_file, "wt")
+            fin.write(str(self.lastcall))
+        else:
+            self.lastcall = float(content)
+        fin.close()        
+
+    def __call__(self):
+        tt = time.time()
+        wait = self.wait
+
+        timeago = tt - self.lastcall
+        if pydelicious.DEBUG>0: print "prev : ", self.lastcall, " cur : ", tt, " ago : ", timeago, " wait : ", wait
+        if timeago < wait:
+            wait = wait - timeago
+            if pydelicious.DEBUG>0: print  "Waiting %s seconds." % wait
+            time.sleep(wait)
+            self.waited += 1
+            self._update(tt + wait)
+        else:
+            self._update(tt)
+    
+    def _update(self, lastcall):
+        self.lastcall = lastcall
+        fin = open(stamp_file, "wt")
+        fin.write(str(lastcall))
+        fin.close()
+
 def main():
     cache = Cache("Konstantin_Grigoriev", "parabolla_84")
-    cache.refresh()
+    #cache.refresh()
     
 if __name__ == '__main__':
     main()
