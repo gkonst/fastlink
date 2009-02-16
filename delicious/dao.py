@@ -122,3 +122,25 @@ class DAO(object):
         finally:
             c.close() 
         log.debug("updating posts...Ok")
+        
+    def find_posts_by_tag(self, tag, exact):
+        log.debug("getting posts by tag...%s", tag)
+        c = self.conn.cursor()
+        try:
+            if not exact:
+                tag = tag + '%'
+            result= c.execute('SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ?', (tag ,)).fetchall()
+        finally:
+            c.close()
+        log.debug("getting posts by tag...Ok(%s found)", len(result))
+        return result          
+
+    def findTags(self, pattern):
+        log.debug("getting tags...%s", pattern)
+        c = self.conn.cursor()
+        try:
+            result= c.execute('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY t.name', (pattern + '%',)).fetchall()
+        finally:
+            c.close()
+        log.debug("getting tags...Ok(%s found)", len(result))
+        return result    

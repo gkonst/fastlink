@@ -16,7 +16,7 @@ class Cache(object):
         self.dao = DAO()
         self.username = username
         self.password = password
-        pydelicious.DEBUG = 1
+        pydelicious.DEBUG = 0
         pydelicious.Waiter = _FileWaiter(DLCS_WAIT_TIME, "pydelicious.stamp")       
         self.api = DeliciousAPI(self.username, self.password)
         log.debug("opening cache...Ok")
@@ -47,6 +47,12 @@ class Cache(object):
         
     def _update_last_sync(self):
         self.dao.update_last_sync(time.time())
+        
+    def find_posts_by_tag(self, tag, exact):
+        return self.dao.find_posts_by_tag(tag, exact)
+    
+    def findTags(self, pattern):
+        return self.dao.findTags(pattern)
 
 class _FileWaiter:
     """Waiter makes sure a certain amount of time passes between
@@ -62,17 +68,18 @@ class _FileWaiter:
     def __init__(self, wait, stamp_file):
         self.wait = wait
         self.waited = 0
-        if not os.path.exists(stamp_file):
-            if pydelicious.DEBUG>0: print "Creating stamp in : ", stamp_file 
-            fin = open(stamp_file, "wt")
-            fin = open(stamp_file, "rt")
+        self.stamp_file = stamp_file
+        if not os.path.exists(self.stamp_file):
+            if pydelicious.DEBUG>0: print "Creating stamp in : ", self.stamp_file 
+            fin = open(self.stamp_file, "wt")
+            fin = open(self.stamp_file, "rt")
         else:
-            if pydelicious.DEBUG>0: print "Using stamp in : ", stamp_file
-            fin = open(stamp_file, "rt")
+            if pydelicious.DEBUG>0: print "Using stamp in : ", self.stamp_file
+            fin = open(self.stamp_file, "rt")
         content = fin.read()
         if not content:
             self.lastcall = 0
-            fin = open(stamp_file, "wt")
+            fin = open(self.stamp_file, "wt")
             fin.write(str(self.lastcall))
         else:
             self.lastcall = float(content)
@@ -95,13 +102,13 @@ class _FileWaiter:
     
     def _update(self, lastcall):
         self.lastcall = lastcall
-        fin = open(stamp_file, "wt")
+        fin = open(self.stamp_file, "wt")
         fin.write(str(lastcall))
         fin.close()
 
 def main():
     cache = Cache("Konstantin_Grigoriev", "parabolla_84")
-    #cache.refresh()
+    cache.refresh()
     
 if __name__ == '__main__':
     main()

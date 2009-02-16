@@ -600,7 +600,6 @@ class DeliciousAPI:
         self._api_request = api_request
         assert callable(xml_parser)
         self._parse_response = xml_parser
-        print "pyWaiter : ", Waiter
     ### Core functionality
 
     def request(self, path, _raw=False, **params):
