@@ -4,9 +4,9 @@ from util import log
 
 class DAO(object):
     
-    def __init__(self):
-        log.debug(" opening database...")
-        self.conn = sqlite3.connect("delicious.cache")
+    def __init__(self, database):
+        log.debug(" opening database...%s", database)
+        self.conn = sqlite3.connect(database)
         c = self.conn.cursor()
         try:
             cache_version = c.execute('SELECT VALUE FROM PARAM WHERE KEY = ?', ("cache_version",)).fetchone()[0]
@@ -16,6 +16,11 @@ class DAO(object):
         finally:
             c.close()
         log.debug(" opening database...Ok")
+        
+    def __del__(self):
+        log.debug(" closing database...")
+        self.conn.close()
+        log.debug(" closing database...Ok")
 
     def _create_db(self):
         log.debug(" creating new database...")
@@ -89,6 +94,16 @@ class DAO(object):
 
     def get_last_update(self):
         return self.get_param("last_update")          
+    
+    def clear_tags(self):
+        log.debug("clearing tags...")
+        c = self.conn.cursor()
+        try:
+            c.execute('DELETE FROM TAG')
+            self.conn.commit()
+        finally:
+            c.close()        
+        log.debug("clearing tags...Ok")
         
     def update_tags(self, tags):
         log.debug("updating tags... : %s", tags)
@@ -99,6 +114,16 @@ class DAO(object):
         finally:
             c.close() 
         log.debug("updating tags...Ok")
+
+    def clear_posts(self):
+        log.debug("clearing posts...")
+        c = self.conn.cursor()
+        try:
+            c.execute('DELETE FROM POST')
+            self.conn.commit()
+        finally:
+            c.close()        
+        log.debug("clearing posts...Ok")
         
     def update_posts(self, posts):       
         log.debug("updating posts... : %s", posts)
@@ -124,18 +149,20 @@ class DAO(object):
         log.debug("updating posts...Ok")
         
     def find_posts_by_tag(self, tag, exact):
-        log.debug("getting posts by tag...%s", tag)
+        log.debug("getting posts by tag %s, exact=%s...", tag, exact)
         c = self.conn.cursor()
         try:
             if not exact:
-                tag = tag + '%'
-            result= c.execute('SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ?', (tag ,)).fetchall()
+                result= c.execute("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ?""", ("%" + tag + "%" ,)).fetchall()
+            else:
+                result= c.execute("""SELECT p.title, p.url, p.tag FROM POST p 
+                    WHERE p.tag LIKE ? OR p.tag LIKE ? OR p.tag LIKE ?""", ("% " + tag + " %" , tag + "%", "%" + tag)).fetchall()
         finally:
             c.close()
         log.debug("getting posts by tag...Ok(%s found)", len(result))
         return result          
 
-    def findTags(self, pattern):
+    def find_tags(self, pattern):
         log.debug("getting tags...%s", pattern)
         c = self.conn.cursor()
         try:

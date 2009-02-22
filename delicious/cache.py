@@ -6,19 +6,22 @@ from pydelicious import DeliciousAPI, DLCS_WAIT_TIME
 
 from dao import DAO
 from util import log
+import config
 
 sync_timeout = 30
 
 class Cache(object):
     
-    def __init__(self, username, password):
+    def __init__(self):
         log.debug("opening cache...")
-        self.dao = DAO()
-        self.username = username
-        self.password = password
+        if not config.username:
+            raise ValueError("username not specified")
+        log.debug(" for delicious user : %s", config.username)
+        self.dao = DAO(os.path.join(config.config_dir, "%s.cache" % config.username))
         pydelicious.DEBUG = 0
-        pydelicious.Waiter = _FileWaiter(DLCS_WAIT_TIME, "pydelicious.stamp")       
-        self.api = DeliciousAPI(self.username, self.password)
+        pydelicious.Waiter = _FileWaiter(DLCS_WAIT_TIME, os.path.join(config.config_dir, "pydelicious.stamp"))       
+        self.api = DeliciousAPI(config.username, config.password)
+        self.refresh()
         log.debug("opening cache...Ok")
     
     def refresh(self):
@@ -31,19 +34,15 @@ class Cache(object):
             log.debug(" last_update : %s, in cache : %s", last_update, last_update_in_cache)
             if(last_update != last_update_in_cache):
                 log.debug("refreshing cache...")
-                self._refresh_tags()
-                self._refresh_posts()
+                tags = self.api.tags_get()['tags']
+                posts = self.api.posts_all()['posts']
+                self.dao.clear_posts()
+                self.dao.clear_tags()
+                self.dao.update_tags(tags)
+                self.dao.update_posts(posts)
                 self.dao.update_last_update(last_update)
                 self._update_last_sync()
                 log.debug("refreshing cache...Ok")
-        
-    def _refresh_tags(self):
-        tags = self.api.tags_get()['tags']
-        self.dao.update_tags(tags)
-
-    def _refresh_posts(self):
-        posts = self.api.posts_all()['posts']
-        self.dao.update_posts(posts)
         
     def _update_last_sync(self):
         self.dao.update_last_sync(time.time())
@@ -51,8 +50,8 @@ class Cache(object):
     def find_posts_by_tag(self, tag, exact):
         return self.dao.find_posts_by_tag(tag, exact)
     
-    def findTags(self, pattern):
-        return self.dao.findTags(pattern)
+    def find_tags(self, pattern):
+        return self.dao.find_tags(pattern)
 
 class _FileWaiter:
     """Waiter makes sure a certain amount of time passes between
