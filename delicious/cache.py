@@ -8,7 +8,7 @@ from dao import DAO
 from util import log
 import config
 
-sync_timeout = 30
+sync_timeout = 6000
 
 class Cache(object):
     
@@ -26,12 +26,14 @@ class Cache(object):
     
     def refresh(self):
         last_sync = self.dao.get_last_sync()
-        log.debug(" cache last_sync : %s", last_sync)
         if not last_sync or last_sync and time.time() - float(last_sync) > sync_timeout:
+            if last_sync and time.time() - float(last_sync) > sync_timeout:
+                log.debug(" sync timeout exceeded : %s", time.time() - float(last_sync))
             last_update_in_cache = self.dao.get_last_update()
             ttt = self.api.posts_update()
             last_update = time.strftime("%a, %d %b %Y %H:%M:%S +0000", ttt["update"]["time"])
             log.debug(" last_update : %s, in cache : %s", last_update, last_update_in_cache)
+            self._update_last_sync()
             if(last_update != last_update_in_cache):
                 log.debug("refreshing cache...")
                 tags = self.api.tags_get()['tags']
@@ -40,8 +42,7 @@ class Cache(object):
                 self.dao.clear_tags()
                 self.dao.update_tags(tags)
                 self.dao.update_posts(posts)
-                self.dao.update_last_update(last_update)
-                self._update_last_sync()
+                self.dao.update_last_update(last_update)              
                 log.debug("refreshing cache...Ok")
         
     def _update_last_sync(self):
@@ -69,11 +70,11 @@ class _FileWaiter:
         self.waited = 0
         self.stamp_file = stamp_file
         if not os.path.exists(self.stamp_file):
-            if pydelicious.DEBUG>0: print "Creating stamp in : ", self.stamp_file 
+            if pydelicious.DEBUG > 0: print "Creating stamp in : ", self.stamp_file 
             fin = open(self.stamp_file, "wt")
             fin = open(self.stamp_file, "rt")
         else:
-            if pydelicious.DEBUG>0: print "Using stamp in : ", self.stamp_file
+            if pydelicious.DEBUG > 0: print "Using stamp in : ", self.stamp_file
             fin = open(self.stamp_file, "rt")
         content = fin.read()
         if not content:
@@ -89,10 +90,10 @@ class _FileWaiter:
         wait = self.wait
 
         timeago = tt - self.lastcall
-        if pydelicious.DEBUG>0: print "prev : ", self.lastcall, " cur : ", tt, " ago : ", timeago, " wait : ", wait
+        if pydelicious.DEBUG > 0: print "prev : ", self.lastcall, " cur : ", tt, " ago : ", timeago, " wait : ", wait
         if timeago < wait:
             wait = wait - timeago
-            if pydelicious.DEBUG>0: print  "Waiting %s seconds." % wait
+            if pydelicious.DEBUG > 0: print  "Waiting %s seconds." % wait
             time.sleep(wait)
             self.waited += 1
             self._update(tt + wait)
@@ -104,10 +105,3 @@ class _FileWaiter:
         fin = open(self.stamp_file, "wt")
         fin.write(str(lastcall))
         fin.close()
-
-def main():
-    cache = Cache("Konstantin_Grigoriev", "parabolla_84")
-    cache.refresh()
-    
-if __name__ == '__main__':
-    main()

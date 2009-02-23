@@ -65,13 +65,13 @@ class DAO(object):
         log.debug("getting %s...", param_name)
         c = self.conn.cursor()
         try:
-            last_sync = c.execute('SELECT VALUE FROM PARAM WHERE KEY = ?', (param_name,)).fetchone()
-            if last_sync:
-                last_sync = last_sync[0]
+            param_value = c.execute('SELECT VALUE FROM PARAM WHERE KEY = ?', (param_name,)).fetchone()
+            if param_value:
+                param_value = param_value[0]
         finally:
             c.close()
-        log.debug("getting %s...Ok", param_name)
-        return last_sync
+        log.debug("getting %s...Ok(%s)", param_name, param_value)
+        return param_value
             
     def update_param(self, param_name, param_value):
         log.debug("updating %s with value %s...", param_name, param_value)

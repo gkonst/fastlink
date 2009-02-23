@@ -2,8 +2,10 @@ import os
 import base64
 import ConfigParser
 from Tkinter import Tk
+from _tkinter import TclError
 
 from list import BoormarkList
+from detail import BookmarkDetail
 from util import log
 import config
     
@@ -25,10 +27,14 @@ class Delicious(object):
                 log.debug("loading password from config : %s", config.password)
         
         root = Tk()
-    #    root.tk.call('package', 'require', 'tile')
-    #    root.tk.call('namespace', 'import', '-force', 'ttk::*')
-    #    root.tk.call('tile::setTheme', 'clam')
-        BoormarkList(root)
+#        try:
+#            root.tk.call('package', 'require', 'tile')
+#            root.tk.call('namespace', 'import', '-force', 'ttk::*')
+#            root.tk.call('ttk::setTheme', 'clam')
+#        except TclError:
+#            pass
+#        BoormarkList(root)
+        BookmarkDetail(root)
         root.mainloop()    
     
     def __del__(self):
@@ -51,8 +57,7 @@ class Delicious(object):
         return base64.b64decode(password)
     
 def main():
-    Delicious()
-   
+    Delicious()  
     
 if __name__ == '__main__':
     main()

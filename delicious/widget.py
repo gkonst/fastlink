@@ -7,7 +7,7 @@ from Tkinter import *
 
 class ZDialog(Toplevel):
 
-    def __init__(self, parent, title = None):
+    def __init__(self, parent, title=None):
         Toplevel.__init__(self, parent)
         self.transient(parent)
         if title:
@@ -22,8 +22,8 @@ class ZDialog(Toplevel):
         if not self.initial_focus:
             self.initial_focus = self
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
-                                  parent.winfo_rooty()+50))
+        self.geometry("+%d+%d" % (parent.winfo_rootx() + 50,
+                                  parent.winfo_rooty() + 50))
         self.initial_focus.focus_set()
         self.wait_window(self)
 
@@ -75,16 +75,28 @@ class ZEntry(Frame):
         Frame.__init__(self, master)
         if label:
             label = Label(self, text=label)
-            label.grid(row = 0, column = 0)
+            label.grid(row=0, column=0)
         self._value = StringVar(value=value)
-        entry = Entry(self, bg = "#FFFFFF", textvariable=self._value, **kw)
-        entry.grid(row = 0, column = 1)
+        self._entry = Entry(self, background="#FFFFFF", textvariable=self._value, **kw)
+        self._entry.grid(row=0, column=1)
+    
+    def __getitem__(self, key):
+        return self._entry.__getitem__(key)
+    
+    def __setitem__(self, key, value):
+        self._entry.__setitem__(key, value)
         
     def value(self, value=None):
         if value:
             self._value.set(value)
         else:
             return self._value.get()
+        
+    def add_listener(self, action, listener):
+        self._entry.bind(action, listener)
+        
+    def focus(self):
+        self._entry.focus_set()
         
 class ZPasswordEntry(ZEntry):
     def __init__(self, master=None, label="", value="", **kw):
@@ -94,10 +106,10 @@ class ZListBox(Frame):
     def __init__(self, master=None, **kw):
         Frame.__init__(self, master)
         yScroll = Scrollbar(self, orient=VERTICAL)
-        yScroll.grid(row=0, column=1, sticky=N+S)
-        self._list = Listbox(self, kw, bg = "#FFFFFF", yscrollcommand=yScroll.set)
-        yScroll["command"]  =  self._list.yview
-        self._list.grid(row = 0, column = 0, sticky=W)
+        yScroll.grid(row=0, column=1, sticky=N + S)
+        self._list = Listbox(self, background="#FFFFFF", yscrollcommand=yScroll.set, **kw)
+        yScroll["command"] = self._list.yview
+        self._list.grid(row=0, column=0, sticky=W)
         
     def set_data(self, data, func):
         self.clear_data()
