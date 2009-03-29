@@ -1,6 +1,9 @@
+#!/usr/bin/python
 import os
+import sys
 import base64
 import ConfigParser
+from optparse import OptionParser
 from Tkinter import Tk
 from _tkinter import TclError
 
@@ -11,6 +14,9 @@ import config
     
 class Delicious(object):
     def __init__(self):
+        parser = OptionParser()
+        parser.add_option("-m", "--mode", dest="mode", default="list", help="Application mode : list or detail")
+        (options, args) = parser.parse_args()
         home_dir = os.path.expanduser("~")
         config.config_dir = os.path.join(home_dir, ".delicious")
         if not os.path.exists(config.config_dir) or not os.path.isdir(config.config_dir):
@@ -33,22 +39,28 @@ class Delicious(object):
 #            root.tk.call('ttk::setTheme', 'clam')
 #        except TclError:
 #            pass
-#        BoormarkList(root)
-        BookmarkDetail(root)
+        if options.mode == "list":  
+            BoormarkList(root)
+        elif options.mode == "detail":  
+            BookmarkDetail(root)
+        else:
+            print "Unknown mode %s", options.mode
+            sys.exit()
         root.mainloop()    
     
     def __del__(self):
-        log.debug("saving config...")
-        config_parser = ConfigParser.RawConfigParser()
-        config_parser.add_section("main")
-        if config.username:
-            config_parser.set("main", "username", config.username)
-        if config.password:
-            config_parser.set("main", "password", self.crypt_password(config.password))
-        fo = open(os.path.join(config.config_dir, "config"), "w")
-        config_parser.write(fo)
-        fo.close()
-        log.debug("saving config...Ok")
+        if config.config_dir:
+            log.debug("saving config...")
+            config_parser = ConfigParser.RawConfigParser()
+            config_parser.add_section("main")
+            if config.username:
+                config_parser.set("main", "username", config.username)
+            if config.password:
+                config_parser.set("main", "password", self.crypt_password(config.password))
+            fo = open(os.path.join(config.config_dir, "config"), "w")
+            config_parser.write(fo)
+            fo.close()
+            log.debug("saving config...Ok")
         
     def crypt_password(self, password):
         return base64.b64encode(password)

@@ -147,15 +147,55 @@ class DAO(object):
         finally:
             c.close() 
         log.debug("updating posts...Ok")
+
+    def save_post(self, post):
+        log.debug("saving post...%s", post)
+        self._update_tags_for_post(post['tag'].split())
+        c = self.conn.cursor()
+        try:
+             c.execute("""INSERT OR REPLACE INTO POST(URL, 
+                                                      TITLE, 
+                                                      NOTES,
+                                                      TAG,
+                                                      HASH,
+                                                      TIMESTAMP) 
+                                                VALUES(:href,
+                                                       :description,
+                                                       :extended,
+                                                       :tag,
+                                                       :hash,
+                                                       :time)""", post)           
+             self.conn.commit()
+        finally:
+            c.close() 
+        log.debug("saving post...Ok")
+        
+    def _update_tags_for_post(self, tags):
+        log.debug("updating tags for post...%s", tags)
+        c = self.conn.cursor()
+        try:
+            for tag in tags:
+                count = c.execute('SELECT COUNT FROM TAG WHERE NAME = ?', (tag,)).fetchone()
+                if count:
+                    count = count[0] + 1
+                    log.debug(" tag %s found -> increasing count to %s", tag, count)
+                else:
+                    log.debug(" tag %s not found -> count=0", tag)
+                    count = 0
+                c.execute('INSERT OR REPLACE INTO TAG(NAME, COUNT) VALUES(?, ?)', (tag, count))
+                self.conn.commit()
+        finally:
+            c.close() 
+        log.debug("updating tags for post...Ok")
         
     def find_posts_by_tag(self, tag, exact):
         log.debug("getting posts by tag %s, exact=%s...", tag, exact)
         c = self.conn.cursor()
         try:
             if not exact:
-                result= c.execute("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ?""", ("%" + tag + "%" ,)).fetchall()
+                result = c.execute("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ?""", ("%" + tag + "%" ,)).fetchall()
             else:
-                result= c.execute("""SELECT p.title, p.url, p.tag FROM POST p 
+                result = c.execute("""SELECT p.title, p.url, p.tag FROM POST p 
                     WHERE p.tag LIKE ? OR p.tag LIKE ? OR p.tag LIKE ?""", ("% " + tag + " %" , tag + "%", "%" + tag)).fetchall()
         finally:
             c.close()
@@ -166,7 +206,7 @@ class DAO(object):
         log.debug("getting tags...%s", pattern)
         c = self.conn.cursor()
         try:
-            result= c.execute('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY t.name', (pattern + '%',)).fetchall()
+            result = c.execute('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY t.name', (pattern + '%',)).fetchall()
         finally:
             c.close()
         log.debug("getting tags...Ok(%s found)", len(result))

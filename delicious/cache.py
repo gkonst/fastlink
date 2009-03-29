@@ -53,6 +53,17 @@ class Cache(object):
     
     def find_tags(self, pattern):
         return self.dao.find_tags(pattern)
+    
+    def save_post(self, url, title, tags):
+        log.debug("saving post...")
+        self.api.posts_add(url=url, description=title, tags=tags)
+        last_added = self.api.posts_recent(count=1)['posts'][0]
+        self.dao.save_post(last_added)
+        self._update_last_sync()
+        ttt = self.api.posts_update()
+        last_update = time.strftime("%a, %d %b %Y %H:%M:%S +0000", ttt["update"]["time"])
+        self.dao.update_last_update(last_update) 
+        log.debug("saving post...Ok")
 
 class _FileWaiter:
     """Waiter makes sure a certain amount of time passes between
