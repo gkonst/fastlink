@@ -4,8 +4,6 @@ import base64
 import ConfigParser
 from optparse import OptionParser
 
-import delicious.tkinter.list as tkinter_list
-import delicious.tkinter.detail as tkinter_detail
 from delicious.core.util import log
 import delicious.core.config as config
     
@@ -13,6 +11,7 @@ class Delicious(object):
     def __init__(self):
         parser = OptionParser()
         parser.add_option("-m", "--mode", dest="mode", default="list", help="Application mode : list or detail")
+        parser.add_option("-u", "--ui", dest="ui", default="qt", help="Application ui : tkinter or qt")
         (options, args) = parser.parse_args()
         home_dir = os.path.expanduser("~")
         config.config_dir = os.path.join(home_dir, ".delicious")
@@ -29,10 +28,19 @@ class Delicious(object):
                 config.password = self.decrypt_password(config_parser.get("main", "password"))
                 log.debug("loading password from config : %s", config.password)
         
+        if options.ui == "tkinter":
+            import delicious.tkinter.list as list
+            import delicious.tkinter.detail as detail
+        elif options.ui == "qt":            
+            import delicious.qt.list as list
+        else:
+            print "Unknown ui %s", options.ui
+            sys.exit() 
+                        
         if options.mode == "list":  
-            tkinter_list.start_ui()
+            list.start_ui()
         elif options.mode == "detail":  
-            tkinter_detail.start_ui()
+            detail.start_ui()
         else:
             print "Unknown mode %s", options.mode
             sys.exit() 
