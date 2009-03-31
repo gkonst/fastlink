@@ -1,7 +1,7 @@
 import time
 import os
 
-import delicious.core.pydelicious
+import delicious.core.pydelicious as pydelicious
 from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME
 
 from delicious.core.dao import DAO

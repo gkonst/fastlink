@@ -8,8 +8,8 @@ from _tkinter import TclError
 
 from delicious.tkinter.list import BoormarkList
 from delicious.tkinter.detail import BookmarkDetail
-from delicious.util import log
-import delicious.config as config
+from delicious.core.util import log
+import delicious.core.config as config
     
 class Delicious(object):
     def __init__(self):
