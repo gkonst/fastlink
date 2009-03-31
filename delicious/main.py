@@ -3,11 +3,9 @@ import sys
 import base64
 import ConfigParser
 from optparse import OptionParser
-from Tkinter import Tk
-from _tkinter import TclError
 
-from delicious.tkinter.list import BoormarkList
-from delicious.tkinter.detail import BookmarkDetail
+import delicious.tkinter.list as tkinter_list
+import delicious.tkinter.detail as tkinter_detail
 from delicious.core.util import log
 import delicious.core.config as config
     
@@ -31,21 +29,13 @@ class Delicious(object):
                 config.password = self.decrypt_password(config_parser.get("main", "password"))
                 log.debug("loading password from config : %s", config.password)
         
-        root = Tk()
-#        try:
-#            root.tk.call('package', 'require', 'tile')
-#            root.tk.call('namespace', 'import', '-force', 'ttk::*')
-#            root.tk.call('ttk::setTheme', 'clam')
-#        except TclError:
-#            pass
         if options.mode == "list":  
-            BoormarkList(root)
+            tkinter_list.start_ui()
         elif options.mode == "detail":  
-            BookmarkDetail(root)
+            tkinter_detail.start_ui()
         else:
             print "Unknown mode %s", options.mode
-            sys.exit()
-        root.mainloop()    
+            sys.exit() 
     
     def __del__(self):
         if config.config_dir:

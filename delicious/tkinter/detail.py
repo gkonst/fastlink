@@ -10,6 +10,17 @@ from delicious.tkinter.widget import ZEntry
 from delicious.core.cache import Cache
 from delicious.core.util import log
 
+def start_ui():
+    root = Tk()
+#        try:
+#            root.tk.call('package', 'require', 'tile')
+#            root.tk.call('namespace', 'import', '-force', 'ttk::*')
+#            root.tk.call('ttk::setTheme', 'clam')
+#        except TclError:
+#            pass
+    BoormarkDetail(root)
+    root.mainloop()
+
 class BookmarkDetail(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)

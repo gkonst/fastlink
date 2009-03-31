@@ -13,6 +13,17 @@ from delicious.tkinter.login import Login
 from delicious.tkinter.widget import ZListBox, ZEntry
 import delicious.core.config as config   
 
+def start_ui():
+    root = Tk()
+#        try:
+#            root.tk.call('package', 'require', 'tile')
+#            root.tk.call('namespace', 'import', '-force', 'ttk::*')
+#            root.tk.call('ttk::setTheme', 'clam')
+#        except TclError:
+#            pass
+    BoormarkList(root)
+    root.mainloop()
+
 class BoormarkList(Frame):
 
     def __init__(self, master=None):
