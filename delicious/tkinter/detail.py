@@ -6,9 +6,9 @@ Created on Feb 22, 2009
 from Tkinter import *
 import urllib
 
-from widget import ZEntry
-from cache import Cache
-from util import log
+from delicious.tkinter.widget import ZEntry
+from delicious.core.cache import Cache
+from delicious.core.util import log
 
 class BookmarkDetail(Frame):
     def __init__(self, master=None):

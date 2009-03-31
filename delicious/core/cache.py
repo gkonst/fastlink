@@ -1,12 +1,12 @@
 import time
 import os
 
-import pydelicious
-from pydelicious import DeliciousAPI, DLCS_WAIT_TIME
+import delicious.core.pydelicious
+from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME
 
-from dao import DAO
-from util import log
-import config
+from delicious.core.dao import DAO
+from delicious.core.util import log
+import delicious.core.config as config
 
 sync_timeout = 6000
 

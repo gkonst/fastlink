@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import os
 import sys
 import base64
@@ -7,10 +6,10 @@ from optparse import OptionParser
 from Tkinter import Tk
 from _tkinter import TclError
 
-from list import BoormarkList
-from detail import BookmarkDetail
-from util import log
-import config
+from delicious.tkinter.list import BoormarkList
+from delicious.tkinter.detail import BookmarkDetail
+from delicious.util import log
+import delicious.config as config
     
 class Delicious(object):
     def __init__(self):

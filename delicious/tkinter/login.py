@@ -5,9 +5,9 @@ Created on Feb 22, 2009
 '''
 from Tkinter import *
 
-from widget import ZDialog, ZEntry, ZPasswordEntry
-from util import log
-import config
+from delicious.tkinter.widget import ZDialog, ZEntry, ZPasswordEntry
+from delicious.core.util import log
+import delicious.core.config as config
 
 class Login(ZDialog):
     def __init__(self, master=None):

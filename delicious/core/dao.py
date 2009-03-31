@@ -1,6 +1,6 @@
 import sqlite3
 
-from util import log
+from delicious.core.util import log
 
 class DAO(object):
     

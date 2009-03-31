@@ -7,11 +7,11 @@ from Tkinter import *
 import tkFont
 import webbrowser
 
-from cache import Cache
-from util import log
-from login import Login
-from widget import ZListBox, ZEntry
-import config   
+from delicious.cache import Cache
+from delicious.util import log
+from delicious.tkinter.login import Login
+from delicious.tkinter.widget import ZListBox, ZEntry
+import delicious.config as config   
 
 class BoormarkList(Frame):
 
