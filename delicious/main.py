@@ -33,6 +33,7 @@ class Delicious(object):
             import delicious.tkinter.detail as detail
         elif options.ui == "qt":            
             import delicious.qt.list as list
+            import delicious.qt.detail as detail
         else:
             print "Unknown ui %s", options.ui
             sys.exit() 

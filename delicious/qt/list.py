@@ -13,17 +13,18 @@ from PyQt4.QtCore import pyqtSignature
 
 from delicious.core.cache import Cache
 from delicious.core.util import log
-import delicious.core.config as config 
+import delicious.core.config as config
+from delicious.qt.login import Login 
 
-from delicious.qt.Ui_list import Ui_BoormarkList
+from delicious.qt.Ui_list import Ui_BookmarkList
 
 def start_ui():
     app = QApplication(sys.argv)
-    wnd = BoormarkList()
+    wnd = BookmarkList()
     wnd.show()
     sys.exit(app.exec_())
 
-class BoormarkList(QMainWindow, Ui_BoormarkList):
+class BookmarkList(QMainWindow, Ui_BookmarkList):
     '''
     classdocs
     '''
@@ -34,12 +35,14 @@ class BoormarkList(QMainWindow, Ui_BoormarkList):
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
-#        if not config.username or not config.password:
-#            Login(self)
-#        self.winfo_toplevel().title("Delicious bookmarks : %s" % config.username)
+        if not config.username or not config.password:
+            login = Login(self)
+            login.setModal(True)
+            login.show()
+        self.setWindowTitle("Delicious bookmarks : %s" % config.username)
         self.cache = Cache()
         self.refresh_tags()
-        self.refresh_posts()
+        self.refresh_posts()       
         
     def refresh_tags(self, tag=""):
         tags = self.cache.find_tags(tag)

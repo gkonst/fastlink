@@ -27,4 +27,3 @@ class Login(ZDialog):
         config.username = self.username.value()
         config.password = self.password.value()
         log.debug(" login...username : %s, password : %s", config.username, config.password)
-        

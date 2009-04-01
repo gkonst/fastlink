@@ -9,6 +9,8 @@ import urllib
 from delicious.tkinter.widget import ZEntry
 from delicious.core.cache import Cache
 from delicious.core.util import log
+from delicious.tkinter.login import Login
+import delicious.core.config as config 
 
 def start_ui():
     root = Tk()
@@ -18,7 +20,7 @@ def start_ui():
 #            root.tk.call('ttk::setTheme', 'clam')
 #        except TclError:
 #            pass
-    BoormarkDetail(root)
+    BookmarkDetail(root)
     root.mainloop()
 
 class BookmarkDetail(Frame):
@@ -34,6 +36,9 @@ class BookmarkDetail(Frame):
         self.grid_columnconfigure(0, weight=0, minsize=20, pad=0)
         self.grid_columnconfigure(2, weight=0, minsize=20, pad=0)
         self.create_widgets()
+        if not config.username or not config.password:
+            Login(self)
+        self.winfo_toplevel().title("Delicious bookmarks : %s : save a bookmark" % config.username)
         
     def create_widgets(self):
         clipboard = self.selection_get(selection="CLIPBOARD")
@@ -74,3 +79,4 @@ class BookmarkDetail(Frame):
         self.cache.save_post(self.url.value(), self.title.value(), self.tags.value())
         self.quit()
         
+start_ui()
