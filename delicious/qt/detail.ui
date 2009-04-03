@@ -32,7 +32,7 @@
      <rect>
       <x>60</x>
       <y>20</y>
-      <width>401</width>
+      <width>381</width>
       <height>22</height>
      </rect>
     </property>
@@ -94,6 +94,25 @@
       <width>401</width>
       <height>22</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="show_url">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>20</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>

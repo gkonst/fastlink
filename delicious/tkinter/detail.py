@@ -9,6 +9,7 @@ import urllib
 from delicious.tkinter.widget import ZEntry
 from delicious.core.cache import Cache
 from delicious.core.util import log
+from delicious.core.common import get_title
 from delicious.tkinter.login import Login
 import delicious.core.config as config 
 
@@ -45,7 +46,7 @@ class BookmarkDetail(Frame):
         log.debug(" detecting clipboard : %s", clipboard)
         if clipboard.startswith("http://"):
             self.url = ZEntry(self, label="Url : ", value=clipboard, width=50, state=DISABLED)
-            self.title = ZEntry(self, label="Title : ", value=self.get_title(clipboard), width=50)
+            self.title = ZEntry(self, label="Title : ", value=get_title(clipboard), width=50)
         else:
             self.url = ZEntry(self, label="Url : ", width=50)
             self.title = ZEntry(self, label="Title : ", width=50)           
@@ -67,12 +68,6 @@ class BookmarkDetail(Frame):
     def on_url_dbl_click(self, event):
         if self.url["state"] == DISABLED:
             self.url["state"] = NORMAL
-            
-    def get_title(self, url):
-        log.debug(" fetching page...")
-        content = urllib.urlopen(url).read()
-        log.debug(" reading page title...")
-        return content[content.find('<title>') + len('<title>'):content.find('</title>')]
     
     def save_post(self):
         self.cache = Cache()

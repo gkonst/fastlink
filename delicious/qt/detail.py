@@ -4,7 +4,6 @@ Created on Apr 1, 2009
 @author: kostya
 '''
 import sys
-import urllib
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QMainWindow, QApplication
@@ -12,6 +11,7 @@ from PyQt4.QtCore import pyqtSignature
 
 from delicious.core.cache import Cache
 from delicious.core.util import log
+from delicious.core.common import get_title
 import delicious.core.config as config
 from delicious.qt.login import Login 
 
@@ -44,19 +44,14 @@ class BookmarkDetail(QMainWindow, Ui_BookmarkDetail):
         if clipboard.startswith("http://"):
             self.url.setText(clipboard)
             self.url.setDisabled(True)
-            self.title.setText(self.get_title(clipboard))
+            self.show_url.setEnabled(True)
+            self.title.setText(get_title(clipboard))
             self.tags.setFocus()
 
     @pyqtSignature("")
-    def on_url_dbl_click(self, event):
-        if self.url["state"] == DISABLED:
-            self.url["state"] = NORMAL
-            
-    def get_title(self, url):
-        log.debug(" fetching page...")
-        content = urllib.urlopen(url).read()
-        log.debug(" reading page title...")
-        return content[content.find('<title>') + len('<title>'):content.find('</title>')]
+    def on_show_url_clicked(self):
+        self.url.setEnabled(True)
+        self.show_url.setDisabled(True)
     
     @pyqtSignature("")
     def on_buttonBox_accepted(self):

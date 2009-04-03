@@ -35,7 +35,7 @@ class Delicious(object):
             import delicious.qt.list as list
             import delicious.qt.detail as detail
         else:
-            print "Unknown ui %s", options.ui
+            print "Unknown ui : ", options.ui
             sys.exit() 
                         
         if options.mode == "list":  
@@ -43,7 +43,7 @@ class Delicious(object):
         elif options.mode == "detail":  
             detail.start_ui()
         else:
-            print "Unknown mode %s", options.mode
+            print "Unknown mode : ", options.mode
             sys.exit() 
     
     def __del__(self):
