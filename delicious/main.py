@@ -29,13 +29,15 @@ class Delicious(object):
                 log.debug("loading password from config : %s", config.password)
         
         if options.ui == "tkinter":
-            import delicious.tkinter.list as list
-            import delicious.tkinter.detail as detail
+            (list, detail) = self._import_tkinter()
         elif options.ui == "qt":            
-            import delicious.qt.list as list
-            import delicious.qt.detail as detail
+            if self._detect_qt():
+                (list, detail) = self._import_qt()
+            else:
+                log.warn("QT4 not found -> using Tkinter")
+                (list, detail) = self._import_tkinter()
         else:
-            print "Unknown ui : ", options.ui
+            log.error("Unknown ui : %s", options.ui)
             sys.exit() 
                         
         if options.mode == "list":  
@@ -43,8 +45,27 @@ class Delicious(object):
         elif options.mode == "detail":  
             detail.start_ui()
         else:
-            print "Unknown mode : ", options.mode
-            sys.exit() 
+            log.error("Unknown mode : %s", options.mode)
+            sys.exit()
+            
+    def _import_tkinter(self):
+        import delicious.tkinter.list as list
+        import delicious.tkinter.detail as detail
+        log.debug("Tkinter UI loaded")         
+        return (list, detail)
+
+    def _import_qt(self):
+        import delicious.qt.list as list
+        import delicious.qt.detail as detail
+        log.debug("QT4 UI loaded")
+        return (list, detail)
+    
+    def _detect_qt(self):
+        try:
+            import PyQt4
+            return True 
+        except ImportError:
+            return False        
     
     def __del__(self):
         if config.config_dir:

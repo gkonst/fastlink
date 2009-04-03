@@ -73,5 +73,3 @@ class BookmarkDetail(Frame):
         self.cache = Cache()
         self.cache.save_post(self.url.value(), self.title.value(), self.tags.value())
         self.quit()
-        
-start_ui()

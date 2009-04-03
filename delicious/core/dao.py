@@ -192,7 +192,7 @@ class DAO(object):
         elif order == ORDER_POSTS_TITLE:
             sort = "p.title"
         else:
-            sort = "p.timestamp"
+            sort = "p.timestamp desc"
         if not exact:
             result = self._fetchall("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ? ORDER BY """ + sort, ("%" + tag + "%" ,))
         else:

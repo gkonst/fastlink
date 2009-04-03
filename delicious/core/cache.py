@@ -5,6 +5,7 @@ import delicious.core.pydelicious as pydelicious
 from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME
 
 from delicious.core.dao import DAO
+from delicious.core.common import *
 from delicious.core.util import log
 import delicious.core.config as config
 
@@ -48,10 +49,10 @@ class Cache(object):
     def _update_last_sync(self):
         self.dao.update_last_sync(time.time())
         
-    def find_posts_by_tag(self, tag, exact, order):
+    def find_posts_by_tag(self, tag, exact, order=ORDER_POSTS_LAST):
         return self.dao.find_posts_by_tag(tag, exact, order)
     
-    def find_tags(self, pattern, order):
+    def find_tags(self, pattern, order=ORDER_TAGS_ALPHA):
         return self.dao.find_tags(pattern, order)
     
     def save_post(self, url, title, tags):
