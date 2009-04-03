@@ -48,11 +48,11 @@ class Cache(object):
     def _update_last_sync(self):
         self.dao.update_last_sync(time.time())
         
-    def find_posts_by_tag(self, tag, exact):
-        return self.dao.find_posts_by_tag(tag, exact)
+    def find_posts_by_tag(self, tag, exact, order):
+        return self.dao.find_posts_by_tag(tag, exact, order)
     
-    def find_tags(self, pattern):
-        return self.dao.find_tags(pattern)
+    def find_tags(self, pattern, order):
+        return self.dao.find_tags(pattern, order)
     
     def save_post(self, url, title, tags):
         log.debug("saving post...")

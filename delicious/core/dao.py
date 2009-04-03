@@ -1,5 +1,6 @@
 import sqlite3
 
+from delicious.core.common import *
 from delicious.core.util import log
 
 class DAO(object):
@@ -63,13 +64,9 @@ class DAO(object):
         
     def get_param(self, param_name):
         log.debug("getting %s...", param_name)
-        c = self.conn.cursor()
-        try:
-            param_value = c.execute('SELECT VALUE FROM PARAM WHERE KEY = ?', (param_name,)).fetchone()
-            if param_value:
-                param_value = param_value[0]
-        finally:
-            c.close()
+        param_value = self._fetchone('SELECT VALUE FROM PARAM WHERE KEY = ?', (param_name,))
+        if param_value:
+            param_value = param_value[0]
         log.debug("getting %s...Ok(%s)", param_name, param_value)
         return param_value
             
@@ -188,26 +185,46 @@ class DAO(object):
             c.close() 
         log.debug("updating tags for post...Ok")
         
-    def find_posts_by_tag(self, tag, exact):
+    def find_posts_by_tag(self, tag, exact, order):
         log.debug("getting posts by tag %s, exact=%s...", tag, exact)
-        c = self.conn.cursor()
-        try:
-            if not exact:
-                result = c.execute("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ?""", ("%" + tag + "%" ,)).fetchall()
-            else:
-                result = c.execute("""SELECT p.title, p.url, p.tag FROM POST p 
-                    WHERE p.tag LIKE ? OR p.tag LIKE ? OR p.tag LIKE ?""", ("% " + tag + " %" , tag + "%", "%" + tag)).fetchall()
-        finally:
-            c.close()
+        if order == ORDER_POSTS_URL:
+            sort = "p.url"
+        elif order == ORDER_POSTS_TITLE:
+            sort = "p.title"
+        else:
+            sort = "p.timestamp"
+        if not exact:
+            result = self._fetchall("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ? ORDER BY """ + sort, ("%" + tag + "%" ,))
+        else:
+            result = self._fetchall("""SELECT p.title, p.url, p.tag FROM POST p 
+                WHERE p.tag LIKE ? OR p.tag LIKE ? OR p.tag LIKE ? ORDER BY """ + sort, ("% " + tag + " %" , tag + "%", "%" + tag))
         log.debug("getting posts by tag...Ok(%s found)", len(result))
-        return result          
-
-    def find_tags(self, pattern):
-        log.debug("getting tags...%s", pattern)
+        return result
+    
+    def find_tags(self, pattern, order):
+        log.debug("getting tags...%s, order : %s", pattern, order)
+        if order == ORDER_TAGS_COUNT:
+            sort = "t.count desc"
+        else: 
+            sort = "t.name"
+        result = self._fetchall('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY ' + sort, (pattern + '%',))
+        log.debug("getting tags...Ok(%s found)", len(result))
+        return result
+    
+    def _fetchone(self, query, params):
         c = self.conn.cursor()
         try:
-            result = c.execute('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY t.name', (pattern + '%',)).fetchall()
+            log.debug(" executing query : %s", query)
+            result = c.execute(query, params).fetchone()
         finally:
             c.close()
-        log.debug("getting tags...Ok(%s found)", len(result))
-        return result    
+        return result   
+
+    def _fetchall(self, query, params):
+        c = self.conn.cursor()
+        try:
+            log.debug(" executing query : %s", query)
+            result = c.execute(query, params).fetchall()
+        finally:
+            c.close()
+        return result   

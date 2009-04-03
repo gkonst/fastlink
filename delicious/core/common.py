@@ -7,6 +7,12 @@ import urllib
 
 from util import log
 
+ORDER_TAGS_ALPHA = 0
+ORDER_TAGS_COUNT = 1
+ORDER_POSTS_LAST = 0
+ORDER_POSTS_TITLE = 1
+ORDER_POSTS_URL = 2
+
 def get_title(url):
     log.debug(" fetching page...")
     message = urllib.urlopen(url)
