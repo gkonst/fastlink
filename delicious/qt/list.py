@@ -36,14 +36,22 @@ class BookmarkList(QMainWindow, Ui_BookmarkList):
         """
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
+        self.login()
+        
+    def login(self):
         if not config.username or not config.password:
             login = Login(self)
-            login.setModal(True)
-            login.show()
+            ret = login.exec_()
+            if ret != 0:
+                self.fill()
+        else:
+            self.fill()
+            
+    def fill(self):
         self.setWindowTitle("Delicious bookmarks : %s" % config.username)
         self.cache = Cache()
         self.refresh_tags()
-        self.refresh_posts()       
+        self.refresh_posts()                       
         
     def refresh_tags(self, tag=""):
         tags = self.cache.find_tags(tag, self.tags_order.currentIndex())
@@ -88,4 +96,14 @@ class BookmarkList(QMainWindow, Ui_BookmarkList):
         post = self.posts[index]
         log.debug("selected post : %s", post)
         log.debug("goto url : %s", post[1])
-        webbrowser.open_new_tab(post[1]) 
+        webbrowser.open_new_tab(post[1])
+        
+    @pyqtSignature("")
+    def on_sign_out_triggered(self):
+        config.username = None
+        config.password = None
+        self.login()
+        
+    @pyqtSignature("")
+    def on_about_qt_triggered(self):
+         QtGui.QMessageBox.aboutQt(self)

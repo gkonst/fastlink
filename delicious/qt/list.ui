@@ -164,8 +164,38 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="deliciou_menu">
+    <property name="title">
+     <string>Delicious</string>
+    </property>
+    <addaction name="sign_out"/>
+   </widget>
+   <widget class="QMenu" name="about_menu">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="about_delicious"/>
+    <addaction name="about_qt"/>
+   </widget>
+   <addaction name="deliciou_menu"/>
+   <addaction name="about_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="sign_out">
+   <property name="text">
+    <string>Sign Out</string>
+   </property>
+  </action>
+  <action name="about_delicious">
+   <property name="text">
+    <string>About Delicious</string>
+   </property>
+  </action>
+  <action name="about_qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
