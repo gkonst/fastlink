@@ -4,6 +4,7 @@ Created on Feb 22, 2009
 @author: kostya
 '''
 from Tkinter import *
+import tkMessageBox
 
 from delicious.tkinter.widget import ZDialog, ZEntry, ZPasswordEntry
 from delicious.core.util import log
@@ -22,7 +23,17 @@ class Login(ZDialog):
         self.password = ZPasswordEntry(master, label="Password : ", value=config.password)
         self.password.grid(row=3, column=1)
         return self.username
-        
+    
+    def validate(self):
+        if not self.username.value(): 
+            tkMessageBox.showwarning("Error","Username not specified")
+            return 0;
+        elif not self.password.value():
+            tkMessageBox.showwarning("Error","Password not specified")
+            return 0;
+        else:
+            return 1;
+    
     def apply(self):
         config.username = self.username.value()
         config.password = self.password.value()

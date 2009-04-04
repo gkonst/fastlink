@@ -6,6 +6,7 @@ Created on Feb 21, 2009
 from Tkinter import *
 import tkFont
 import webbrowser
+import sys
 
 from delicious.core.cache import Cache
 from delicious.core.util import log
@@ -38,12 +39,24 @@ class BoormarkList(Frame):
         self.grid_columnconfigure(0, weight=0, minsize=20, pad=0)
         self.grid_columnconfigure(2, weight=0, minsize=20, pad=0)
         self.createWidgets()
+        self.cache = None
+        self.login()
+        
+    def login(self):
         if not config.username or not config.password:
             Login(self)
+            if config.username and config.password:
+                self.fill()
+            else:
+                sys.exit()
+        else:
+            self.fill()
+    
+    def fill(self):
         self.winfo_toplevel().title("Delicious bookmarks : %s" % config.username)
         self.cache = Cache()
         self.refresh_tags()
-        self.refresh_posts()
+        self.refresh_posts()                
 
     def createWidgets(self):
         self.search = ZEntry(self)
