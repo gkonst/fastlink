@@ -40,6 +40,7 @@ class BookmarkDetail(Frame):
         if not config.username or not config.password:
             Login(self)
         self.winfo_toplevel().title("Delicious bookmarks : %s : save a bookmark" % config.username)
+        self.winfo_toplevel().bind("<Escape>", self.quit_handler)
         
     def create_widgets(self):
         clipboard = self.selection_get(selection="CLIPBOARD")
@@ -72,4 +73,7 @@ class BookmarkDetail(Frame):
     def save_post(self):
         self.cache = Cache()
         self.cache.save_post(self.url.value(), self.title.value(), self.tags.value())
+        self.quit()
+        
+    def quit_handler(self, event):
         self.quit()

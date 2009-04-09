@@ -30,6 +30,7 @@ class BoormarkList(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.winfo_toplevel().title("Delicious bookmarks")
+        self.winfo_toplevel().bind("<Escape>", self.quit_handler)
         self.grid()
         self.grid_rowconfigure(0, weight=0, minsize=10, pad=0)
         self.grid_rowconfigure(2, weight=0, minsize=10, pad=0)
@@ -80,7 +81,10 @@ class BoormarkList(Frame):
         if self.cache:
             del self.cache
         Frame.quit(self)
-    
+        
+    def quit_handler(self, event):
+        self.quit()
+            
     def refresh_tags(self, tag=""):
         tags = self.cache.find_tags(tag)
         self.tagList.set_data(tags, lambda item: item[0])
