@@ -87,8 +87,5 @@ class Delicious(object):
     def decrypt_password(self, password):
         return base64.b64decode(password)
     
-def main():
+def start():
     Delicious()  
-    
-if __name__ == '__main__':
-    main()

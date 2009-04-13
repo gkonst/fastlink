@@ -100,7 +100,7 @@ class BoormarkList(Frame):
     def on_post_dbl_clicked(self, event):
         index = self.postList.get_current_index()
         post = self.posts[index]
-        log.debug("selected post : ", post)
-        log.debug("goto url : ", post[1])
+        log.debug("selected post : %s", post)
+        log.debug("goto url : %s", post[1])
         webbrowser.open_new_tab(post[1]) 
         

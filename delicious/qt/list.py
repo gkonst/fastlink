@@ -44,6 +44,8 @@ class BookmarkList(QMainWindow, Ui_BookmarkList):
             ret = login.exec_()
             if ret != 0:
                 self.fill()
+            else:
+                sys.exit()
         else:
             self.fill()
             
