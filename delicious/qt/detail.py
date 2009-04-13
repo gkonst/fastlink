@@ -39,7 +39,7 @@ class BookmarkDetail(QMainWindow, Ui_BookmarkDetail):
             login.setModal(True)
             login.show()
         self.setWindowTitle("Delicious bookmarks : %s : save a bookmark" % config.username)
-        clipboard = str(QApplication.clipboard().text())
+        clipboard = unicode(QApplication.clipboard().text())
         log.debug(" detecting clipboard : %s", clipboard)
         if clipboard.startswith("http://"):
             self.url.setText(clipboard)
@@ -56,9 +56,13 @@ class BookmarkDetail(QMainWindow, Ui_BookmarkDetail):
     @pyqtSignature("")
     def on_buttonBox_accepted(self):
         self.cache = Cache()
-        self.cache.save_post(str(self.url.text()), str(self.title.text()), str(self.tags.text()))
+        self.cache.save_post(unicode(self.url.text()), unicode(self.title.text()), unicode(self.tags.text()))
         QApplication.instance().quit()
 
     @pyqtSignature("")    
     def on_buttonBox_rejected(self):
         QApplication.instance().quit()
+        
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            QApplication.instance().quit()

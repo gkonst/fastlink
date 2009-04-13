@@ -21,5 +21,6 @@ def get_title(url):
     charset = message.info().getparam('charset')
     if charset:
         title = title.decode(charset)
+    title = title.strip()
     log.debug(" reading page title... : %s", title)
     return title

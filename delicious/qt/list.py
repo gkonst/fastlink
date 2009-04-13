@@ -71,8 +71,8 @@ class BookmarkList(QMainWindow, Ui_BookmarkList):
     
     @pyqtSignature("QString")        
     def on_search_textEdited(self, new_text):
-        self.refresh_tags(str(self.search.text()))
-        self.refresh_posts(str(self.search.text()))       
+        self.refresh_tags(unicode(self.search.text()))
+        self.refresh_posts(unicode(self.search.text()))       
         
     @pyqtSignature("")
     def on_tagList_itemSelectionChanged(self):
@@ -82,15 +82,15 @@ class BookmarkList(QMainWindow, Ui_BookmarkList):
             
     @pyqtSignature("int")
     def on_tags_order_currentIndexChanged(self, index):
-        self.refresh_tags(str(self.search.text()))
+        self.refresh_tags(unicode(self.search.text()))
         
     @pyqtSignature("int")
     def on_posts_order_currentIndexChanged(self, index):
         if self.tagList.currentItem():
-            tag = str(self.tagList.currentItem().text())
+            tag = unicode(self.tagList.currentItem().text())
             self.refresh_posts(tag, True)
         else:
-            self.refresh_posts(str(self.search.text()))
+            self.refresh_posts(unicode(self.search.text()))
 
     @pyqtSignature("QListWidgetItem*")    
     def on_postList_itemDoubleClicked(self, item):
@@ -109,3 +109,7 @@ class BookmarkList(QMainWindow, Ui_BookmarkList):
     @pyqtSignature("")
     def on_about_qt_triggered(self):
          QtGui.QMessageBox.aboutQt(self)
+         
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            QApplication.instance().quit()

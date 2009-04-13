@@ -39,3 +39,7 @@ class Login(QDialog, Ui_Login):
         
     def reject(self):
         QApplication.instance().quit()
+        
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            QApplication.instance().quit()
