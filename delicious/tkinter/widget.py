@@ -3,6 +3,8 @@ Created on Feb 22, 2009
 
 @author: kostya
 '''
+import os
+from multiprocessing import Queue
 from Tkinter import *
 
 class ZDialog(Toplevel):
@@ -22,8 +24,8 @@ class ZDialog(Toplevel):
         if not self.initial_focus:
             self.initial_focus = self
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.geometry("+%d+%d" % (parent.winfo_rootx() + 50,
-                                  parent.winfo_rooty() + 50))
+        self.update()
+        self.after_idle(center_on_screen, self)
         self.initial_focus.focus_set()
         self.wait_window(self)
 
@@ -132,4 +134,73 @@ class ZListBox(Frame):
         self._list.bind("<Double-Button-1>", func)
         
     def on_row_click(self, func):
-        self._list.bind("<<ListboxSelect>>", func) 
+        self._list.bind("<<ListboxSelect>>", func)
+
+class ZSplashScreen(Toplevel):
+    '''
+    A Tkinter splash screen (uses a GIF image file, does not need PIL).
+    '''
+    def __init__(self, master, image_file=None, timeout=None):
+        """
+        create a splash screen from a specified image file
+        keep splash screen up for timeout milliseconds
+        """
+        Toplevel.__init__(self, master, relief='raised', borderwidth=1)
+
+        # don't show main window
+#        self.main.withdraw()
+        self.overrideredirect(1)
+        
+        # emulate modal      
+        self.grab_set()
+        self.focus_set()
+        
+        self.i = 0
+        # use Tkinter's PhotoImage for .gif files
+        self.image_file = image_file
+        image = PhotoImage(file=self.image_file % self.i)
+        self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
+        self.canvas.create_image(0, 0, anchor='nw', image=image)
+        self.canvas.pack()   
+        center_on_screen(self)     
+        self.queue = Queue()
+        if timeout:
+            self.after(timeout, self.destroy_splash)
+
+    def start_splash(self):
+        self._animate()
+        
+    def _animate(self):
+        if not os.path.exists(self.image_file % self.i):
+            self.i = 0
+        image = PhotoImage(file=self.image_file % self.i)
+        self.canvas.create_image(0, 0, anchor='nw', image=image)
+        self.canvas.update()  
+        self.i = self.i + 1
+        if self.queue.empty():
+            self.after_idle(self._animate)
+        else:
+            self.destroy_splash()
+            self.quit()               
+
+    def destroy_splash(self):
+        # bring back main window and destroy splash screen
+        self.master.update()
+#        self.main.deiconify()
+        self.withdraw()
+        
+    def stop_splash(self):
+        self.queue.put('STOP')
+       
+def center_on_screen(widget, width=None, height=None):
+    if not width or not height:
+        widget.update()
+        width, height = widget.winfo_width(), widget.winfo_height()
+    widget.update_idletasks()
+
+    xmax = widget.winfo_screenwidth()
+    ymax = widget.winfo_screenheight()
+
+    x0 = xmax / 2 - width / 2
+    y0 = ymax / 2 - height / 2
+    widget.winfo_toplevel().geometry("%dx%d+%d+%d" % (width, height, x0, y0))    

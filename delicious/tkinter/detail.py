@@ -4,9 +4,9 @@ Created on Feb 22, 2009
 @author: kostya
 '''
 from Tkinter import *
-import urllib
+from multiprocessing import Process
 
-from delicious.tkinter.widget import ZEntry
+from delicious.tkinter.widget import ZEntry, ZSplashScreen, ZDialog, center_on_screen
 from delicious.core.cache import Cache
 from delicious.core.util import log
 from delicious.core.common import get_title
@@ -37,6 +37,7 @@ class BookmarkDetail(Frame):
         self.grid_columnconfigure(0, weight=0, minsize=20, pad=0)
         self.grid_columnconfigure(2, weight=0, minsize=20, pad=0)
         self.create_widgets()
+        self.after_idle(center_on_screen, self)
         if not config.username or not config.password:
             Login(self)
         self.winfo_toplevel().title("Delicious bookmarks : %s : save a bookmark" % config.username)
@@ -71,9 +72,13 @@ class BookmarkDetail(Frame):
             self.url["state"] = NORMAL
     
     def save_post(self):
-        self.cache = Cache()
-        self.cache.save_post(self.url.value(), self.title.value(), self.tags.value())
-        self.quit()
+        splash = ZSplashScreen(self, image_file='delicious/images/spinner_%d.gif')
+        def run():
+            self.cache = Cache()    
+            self.cache.save_post(self.url.value(), self.title.value(), self.tags.value())
+            splash.stop_splash()
+        Process(target=run).start()
+        splash.start_splash()
         
     def quit_handler(self, event):
         self.quit()
