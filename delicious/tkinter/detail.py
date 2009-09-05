@@ -38,8 +38,19 @@ class BookmarkDetail(Frame):
         self.grid_columnconfigure(2, weight=0, minsize=20, pad=0)
         self.create_widgets()
         self.after_idle(center_on_screen, self)
+        self.login()
+        
+    def login(self):
         if not config.username or not config.password:
             Login(self)
+            if config.username and config.password:
+                self.fill()
+            else:
+                sys.exit()
+        else:
+            self.fill()
+            
+    def fill(self):
         self.winfo_toplevel().title("Delicious bookmarks : %s : save a bookmark" % config.username)
         self.winfo_toplevel().bind("<Escape>", self.quit_handler)
         

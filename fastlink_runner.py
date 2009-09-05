@@ -4,10 +4,10 @@ Created on Mar 31, 2009
 
 @author: kostya
 '''
-from delicious.main import Delicious
+from delicious.main import start
 
 def main():
-    Delicious()  
+    start()  
     
 if __name__ == '__main__':
     main()

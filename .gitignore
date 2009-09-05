@@ -7,3 +7,5 @@ _eric4project
 dist
 MANIFEST*
 .settings
+build
+*.egg-info
