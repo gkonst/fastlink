@@ -10,7 +10,7 @@ from PyQt4.QtGui import QDialog, QApplication
 from PyQt4.QtCore import pyqtSignature
 
 from delicious.core.util import log
-import delicious.core.config as config 
+from delicious.core.config import config 
 
 from delicious.qt.Ui_login import Ui_Login
 

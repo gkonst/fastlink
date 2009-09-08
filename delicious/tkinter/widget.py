@@ -158,7 +158,8 @@ class ZSplashScreen(Toplevel):
         self.i = 0
         # use Tkinter's PhotoImage for .gif files
         self.image_file = image_file
-        image = PhotoImage(file=self.image_file % self.i)
+        first_image_file = os.path.abspath(self.image_file % self.i)   
+        image = PhotoImage(file=first_image_file)
         self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
         self.canvas.create_image(0, 0, anchor='nw', image=image)
         self.canvas.pack()   
