@@ -3,10 +3,11 @@ Created on Feb 22, 2009
 
 @author: kostya
 '''
+import sys, os
 from Tkinter import *
 from multiprocessing import Process
 
-from delicious.tkinter.widget import ZEntry, ZSplashScreen, ZDialog, center_on_screen
+from delicious.tkinter.widget import ZEntry, ZSplashScreen, center_on_screen
 from delicious.core.cache import Cache
 from delicious.core.util import log
 from delicious.core.common import get_title
@@ -83,7 +84,7 @@ class BookmarkDetail(Frame):
             self.url["state"] = NORMAL
 
     def save_post(self):
-        splash = ZSplashScreen(self, image_file='delicious/images/spinner_%d.gif')
+        splash = ZSplashScreen(self, image_file=os.path.join(sys.path[0], 'delicious/images/spinner_%d.gif'))
         Process(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         splash.start_splash()
         
