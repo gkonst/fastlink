@@ -1,7 +1,7 @@
 '''
-Created on Feb 22, 2009
+Bookmark detail implementation using **Tkinter** library.
 
-@author: kostya
+.. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
 '''
 import sys, os
 from Tkinter import *
@@ -95,6 +95,8 @@ def run(queue, url, title, tags):
     cache = Cache()
     try:    
         cache.save_post(url, title, tags)
+#        import time
+#        time.sleep(3)
         queue.put('STOP')
     except SaveException, e:
         log.exception(e)

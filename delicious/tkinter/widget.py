@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 '''
-Created on Feb 22, 2009
+Contains custom **Tkinter** widgets.
 
-@author: kostya
+.. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
 '''
 import os
 from multiprocessing import Queue
@@ -139,12 +140,12 @@ class ZListBox(Frame):
 
 class ZSplashScreen(Toplevel):
     '''
-    A Tkinter splash screen (uses a GIF image file, does not need PIL).
+    A **Tkinter** splash screen (uses a GIF image file, does not need PIL).
     '''
     def __init__(self, master, image_file=None, timeout=None):
         """
-        create a splash screen from a specified image file
-        keep splash screen up for timeout milliseconds
+        Create a splash screen from a specified image file
+        keep splash screen up for timeout milliseconds.
         """
         Toplevel.__init__(self, master, relief='raised', borderwidth=1)
 
@@ -157,13 +158,19 @@ class ZSplashScreen(Toplevel):
         self.focus_set()
         
         self.i = 0
-        # use Tkinter's PhotoImage for .gif files
-        self.image_file = image_file
-        first_image_file = os.path.abspath(self.image_file % self.i)   
-        image = PhotoImage(file=first_image_file)
-        self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
-        self.canvas.create_image(0, 0, anchor='nw', image=image)
-        self.canvas.pack()   
+        first_image_file = os.path.abspath(image_file % self.i) 
+        if os.path.exists(first_image_file):
+            # Use image if exist
+            # use Tkinter's PhotoImage for .gif files
+            image = PhotoImage(file=first_image_file)
+            self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
+            self.canvas.create_image(0, 0, anchor='nw', image=image)
+            self.canvas.pack()
+            self.image_file = image_file
+        else:
+            self.image_file = None
+            # Use text instead of image
+            Label(self, text='Working...').pack()   
         center_on_screen(self)     
         self.queue = Queue()
         if timeout:
@@ -173,12 +180,13 @@ class ZSplashScreen(Toplevel):
         self._animate()
         
     def _animate(self):
-        if not os.path.exists(self.image_file % self.i):
-            self.i = 0
-        image = PhotoImage(file=self.image_file % self.i)
-        self.canvas.create_image(0, 0, anchor='nw', image=image)
-        self.canvas.update()  
-        self.i = self.i + 1
+        if self.image_file:
+            if not os.path.exists(self.image_file % self.i):
+                self.i = 0
+            image = PhotoImage(file=self.image_file % self.i)
+            self.canvas.create_image(0, 0, anchor='nw', image=image)
+            self.canvas.update()  
+            self.i = self.i + 1
         if self.queue.empty():
             self.after_idle(self._animate)
         elif 'ERROR' in self.queue.get():

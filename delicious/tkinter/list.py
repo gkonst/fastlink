@@ -1,7 +1,7 @@
 '''
-Created on Feb 21, 2009
+Bookmark list implementation using **Tkinter** library.
 
-@author: kostya
+.. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
 '''
 from Tkinter import *
 import tkFont
