@@ -12,7 +12,7 @@ from PyQt4.QtCore import pyqtSignature
 from delicious.core.cache import Cache
 from delicious.core.util import log
 from delicious.core.common import get_title
-import delicious.core.config as config
+from delicious.core.config import config
 from delicious.qt.login import Login 
 
 from delicious.qt.Ui_detail import Ui_BookmarkDetail

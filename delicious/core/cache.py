@@ -7,7 +7,7 @@ from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME
 from delicious.core.dao import DAO
 from delicious.core.common import *
 from delicious.core.util import log
-import delicious.core.config as config
+from delicious.core.config import config
 
 sync_timeout = 6000
 

@@ -11,7 +11,7 @@ from delicious.core.cache import Cache
 from delicious.core.util import log
 from delicious.core.common import get_title
 from delicious.tkinter.login import Login
-import delicious.core.config as config 
+from delicious.core.config import config 
 
 def start_ui():
     root = Tk()
@@ -81,15 +81,16 @@ class BookmarkDetail(Frame):
     def on_url_dbl_click(self, event):
         if self.url["state"] == DISABLED:
             self.url["state"] = NORMAL
-    
+
     def save_post(self):
         splash = ZSplashScreen(self, image_file='delicious/images/spinner_%d.gif')
-        def run():
-            self.cache = Cache()    
-            self.cache.save_post(self.url.value(), self.title.value(), self.tags.value())
-            splash.stop_splash()
-        Process(target=run).start()
+        Process(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         splash.start_splash()
         
     def quit_handler(self, event):
         self.quit()
+
+def run(queue, url, title, tags):
+    cache = Cache()    
+    cache.save_post(url, title, tags)
+    queue.put('STOP')

@@ -12,7 +12,7 @@ from delicious.core.cache import Cache
 from delicious.core.util import log
 from delicious.tkinter.login import Login
 from delicious.tkinter.widget import ZListBox, ZEntry
-import delicious.core.config as config   
+from delicious.core.config import config   
 
 def start_ui():
     root = Tk()

@@ -8,7 +8,7 @@ import tkMessageBox
 
 from delicious.tkinter.widget import ZDialog, ZEntry, ZPasswordEntry
 from delicious.core.util import log
-import delicious.core.config as config
+from delicious.core.config import config
 
 class Login(ZDialog):
     def __init__(self, master=None):
