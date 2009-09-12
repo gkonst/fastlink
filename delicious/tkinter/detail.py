@@ -5,10 +5,10 @@ Created on Feb 22, 2009
 '''
 import sys, os
 from Tkinter import *
-from multiprocessing import Process
+from threading import Thread
 
 from delicious.tkinter.widget import ZEntry, ZSplashScreen, center_on_screen
-from delicious.core.cache import Cache
+from delicious.core.cache import Cache, SaveException
 from delicious.core.util import log
 from delicious.core.common import get_title
 from delicious.tkinter.login import Login
@@ -85,13 +85,17 @@ class BookmarkDetail(Frame):
 
     def save_post(self):
         splash = ZSplashScreen(self, image_file=os.path.join(sys.path[0], 'delicious/images/spinner_%d.gif'))
-        Process(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
+        Thread(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         splash.start_splash()
         
     def quit_handler(self, event):
         self.quit()
 
 def run(queue, url, title, tags):
-    cache = Cache()    
-    cache.save_post(url, title, tags)
-    queue.put('STOP')
+    cache = Cache()
+    try:    
+        cache.save_post(url, title, tags)
+        queue.put('STOP')
+    except SaveException, e:
+        log.exception(e)
+        queue.put('ERROR : %s' % e)

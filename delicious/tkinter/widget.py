@@ -6,6 +6,7 @@ Created on Feb 22, 2009
 import os
 from multiprocessing import Queue
 from Tkinter import *
+import tkMessageBox
 
 class ZDialog(Toplevel):
 
@@ -149,7 +150,7 @@ class ZSplashScreen(Toplevel):
 
         # don't show main window
 #        self.main.withdraw()
-        self.overrideredirect(1)
+#        self.overrideredirect(1)
         
         # emulate modal      
         self.grab_set()
@@ -180,6 +181,9 @@ class ZSplashScreen(Toplevel):
         self.i = self.i + 1
         if self.queue.empty():
             self.after_idle(self._animate)
+        elif 'ERROR' in self.queue.get():
+#            tkMessageBox.showerror('Error during saving', self.queue.get())
+            self.destroy_splash()            
         else:
             self.destroy_splash()
             self.quit()               
@@ -189,6 +193,7 @@ class ZSplashScreen(Toplevel):
         self.master.update()
 #        self.main.deiconify()
         self.withdraw()
+        self.destroy()
         
     def stop_splash(self):
         self.queue.put('STOP')

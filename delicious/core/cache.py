@@ -2,7 +2,7 @@ import time
 import os
 
 import delicious.core.pydelicious as pydelicious
-from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME
+from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME, DeliciousItemExistsError
 
 from delicious.core.dao import DAO
 from delicious.core.common import *
@@ -57,7 +57,10 @@ class Cache(object):
     
     def save_post(self, url, title, tags):
         log.debug("saving post...")
-        self.api.posts_add(url=url, description=title, tags=tags)
+        try:
+            self.api.posts_add(url=url, description=title, tags=tags)
+        except DeliciousItemExistsError, url:
+            raise SaveException('Item already exists : %s' % url)
         last_added = self.api.posts_recent(count=1)['posts'][0]
         self.dao.save_post(last_added)
         self._update_last_sync()
@@ -65,6 +68,9 @@ class Cache(object):
         last_update = time.strftime("%a, %d %b %Y %H:%M:%S +0000", ttt["update"]["time"])
         self.dao.update_last_update(last_update) 
         log.debug("saving post...Ok")
+        
+class SaveException(Exception):
+    pass
 
 class _FileWaiter:
     """Waiter makes sure a certain amount of time passes between
