@@ -4,6 +4,7 @@ Created on Apr 3, 2009
 @author: kostya
 '''
 import urllib
+import re
 
 from util import log
 
@@ -17,8 +18,17 @@ def get_title(url):
     log.debug(" fetching page...")
     message = urllib.urlopen(url)
     content = message.read()
-    title = content[content.find('<title>') + len('<title>'):content.find('</title>')]
+    title_el = re.search('<title>(.*)</title>', content, re.DOTALL and re.IGNORECASE)
+    if title_el:
+        title = title_el.group(1).strip()
+    else:
+        title = ''
     charset = message.info().getparam('charset')
+    if not charset:
+        httpequiv_el = re.search('http-equiv\s*=\s*["\']Content-Type["\']\s*content\s*=\s*["\'].*charset\s*=\s*(.*)["\']', content, re.DOTALL and re.IGNORECASE)
+        if httpequiv_el:
+            charset = httpequiv_el.group(1).strip()
+    log.debug('  page charset : %s', charset)
     if charset:
         title = title.decode(charset)
     title = title.strip()
