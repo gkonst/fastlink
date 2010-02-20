@@ -5,7 +5,7 @@ from optparse import OptionParser
 from fastlink.core.util import log
 from fastlink.core.config import config
     
-class Delicious(object):
+class Fastlink(object):
     def __init__(self):
         parser = OptionParser()
         parser.add_option("-m", "--mode", dest="mode", default="list", help="Application mode : list or detail")
@@ -57,4 +57,4 @@ class Delicious(object):
         config.save()
     
 def start():
-    Delicious()  
+    Fastlink()  
