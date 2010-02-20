@@ -188,12 +188,14 @@ class ZSplashScreen(Toplevel):
             self.i = self.i + 1
         if self.queue.empty():
             self.after_idle(self._animate)
-        elif 'ERROR' in self.queue.get():
-#            tkMessageBox.showerror('Error during saving', self.queue.get())
-            self.destroy_splash()            
         else:
-            self.destroy_splash()
-            self.quit()               
+            queue_message = self.queue.get()
+            if 'ERROR' in queue_message:
+                self.destroy_splash()
+                tkMessageBox.showerror('Error during saving', queue_message)            
+            else:
+                self.destroy_splash()
+                self.quit()               
 
     def destroy_splash(self):
         # bring back main window and destroy splash screen
