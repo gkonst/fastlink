@@ -6,6 +6,7 @@ Bookmark detail implementation using **Tkinter** library.
 import sys, os
 from Tkinter import *
 from threading import Thread
+from pkg_resources import resource_isdir, resource_filename
 
 from fastlink.tkinter.widget import ZEntry, ZSplashScreen, center_on_screen
 from fastlink.core.cache import Cache, SaveException
@@ -84,7 +85,11 @@ class BookmarkDetail(Frame):
             self.url["state"] = NORMAL
 
     def save_post(self):
-        splash = ZSplashScreen(self, image_file=os.path.join(sys.path[0], 'fastlink/images/spinner_%d.gif'))
+        if resource_isdir('fastlink', 'images'):
+            image_file = os.path.join(resource_filename('fastlink', 'images'), 'spinner_%d.gif')
+        else:
+            image_file = None
+        splash = ZSplashScreen(self, image_file=image_file)
         Thread(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         splash.start_splash()
         

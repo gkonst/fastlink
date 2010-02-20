@@ -157,12 +157,11 @@ class ZSplashScreen(Toplevel):
         self.grab_set()
         self.focus_set()
         
-        self.i = 0
-        first_image_file = os.path.abspath(image_file % self.i) 
-        if os.path.exists(first_image_file):
+        self.i = 0  
+        if image_file and os.path.exists(image_file % self.i):
             # Use image if exist
             # use Tkinter's PhotoImage for .gif files
-            image = PhotoImage(file=first_image_file)
+            image = PhotoImage(file=image_file % self.i)
             self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
             self.canvas.create_image(0, 0, anchor='nw', image=image)
             self.canvas.pack()
