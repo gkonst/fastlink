@@ -9,6 +9,9 @@ import ConfigParser
 
 from fastlink.core.util import log
 
+APP_HOME_DIR = os.path.join(os.path.expanduser("~"), ".fastlink")
+    
+
 class LazyConfig(object):
 
     def __init__(self):
@@ -45,8 +48,8 @@ class Config(object):
     
     def __init__(self):
         log.debug('loading config...')
-        home_dir = os.path.expanduser("~")
-        self.config_dir = os.path.join(home_dir, ".fastlink")
+
+        self.config_dir = APP_HOME_DIR
         if not os.path.exists(self.config_dir) or not os.path.isdir(self.config_dir):
             os.mkdir(self.config_dir)
         

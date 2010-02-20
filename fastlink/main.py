@@ -1,9 +1,9 @@
-import sys
+import sys, os
 
 from optparse import OptionParser
 
-from fastlink.core.util import log
-from fastlink.core.config import config
+from fastlink.core.util import log, set_log_file
+from fastlink.core.config import config, APP_HOME_DIR
     
 class Fastlink(object):
     def __init__(self):
@@ -12,6 +12,8 @@ class Fastlink(object):
         parser.add_option("-u", "--ui", dest="ui", default="qt", help="Application ui : tkinter or qt")
         (options, args) = parser.parse_args()
         
+        set_log_file(os.path.join(APP_HOME_DIR, 'fastlink.log'))
+          
         config.configure()
         
         if options.ui == "tkinter":

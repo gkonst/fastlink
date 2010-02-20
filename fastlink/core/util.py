@@ -24,19 +24,26 @@ Module contains various utility methods.
 """
 import time
 import logging
+import logging.handlers
 
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format="[%(levelname)-1s] %(asctime)s %(module)s:%(funcName)s:%(lineno)d - %(message)s"
+    format='[%(levelname)-1s] %(asctime)s %(module)s:%(funcName)s:%(lineno)d - %(message)s'
 )
-log = logging.getLogger("fastlink") 
+log = logging.getLogger('fastlink') 
+
+def set_log_file(file):
+    handler = logging.handlers.RotatingFileHandler(file, maxBytes=500000, backupCount=5)
+    handler.setFormatter(logging.Formatter('[%(levelname)-1s] %(asctime)s %(module)s:%(funcName)s:%(lineno)d - %(message)s'))
+    log.addHandler(handler)
+
 
 def timing(func):
     def timing(*arg):
         t1 = time.time()
         res = func(*arg)
         t2 = time.time()
-        log.debug("*** %s took %0.3f s or %0.3f ms" % (func.func_name, (t2 - t1), (t2 - t1) * 1000.0))
+        log.debug('*** %s took %0.3f s or %0.3f ms' % (func.func_name, (t2 - t1), (t2 - t1) * 1000.0))
         return res
     return timing
