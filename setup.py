@@ -126,7 +126,7 @@ setup(
     include_package_data = True,
     entry_points = """
         [console_scripts]
-            fastlink = delicious.main:start
+            fastlink = fastlink.main:start
     """,
     windows = ["fastlink_runner.py"]
 )

@@ -1,13 +1,13 @@
 import time
 import os
 
-import delicious.core.pydelicious as pydelicious
-from delicious.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME, DeliciousItemExistsError
+import fastlink.core.pydelicious as pydelicious
+from fastlink.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME, DeliciousItemExistsError
 
-from delicious.core.dao import DAO
-from delicious.core.common import *
-from delicious.core.util import log
-from delicious.core.config import config
+from fastlink.core.dao import DAO
+from fastlink.core.common import *
+from fastlink.core.util import log
+from fastlink.core.config import config
 
 sync_timeout = 6000
 

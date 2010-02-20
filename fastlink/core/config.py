@@ -7,7 +7,7 @@ import os
 import base64
 import ConfigParser
 
-from delicious.core.util import log
+from fastlink.core.util import log
 
 class LazyConfig(object):
 
@@ -46,9 +46,12 @@ class Config(object):
     def __init__(self):
         log.debug('loading config...')
         home_dir = os.path.expanduser("~")
-        self.config_dir = os.path.join(home_dir, ".delicious")
+        self.config_dir = os.path.join(home_dir, ".fastlink")
         if not os.path.exists(self.config_dir) or not os.path.isdir(self.config_dir):
             os.mkdir(self.config_dir)
+        
+        self.username = None
+        self.password = None
         
         if os.path.exists(os.path.join(self.config_dir, "config")):
             config_parser = ConfigParser.RawConfigParser()

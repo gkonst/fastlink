@@ -4,7 +4,7 @@ Created on Mar 31, 2009
 
 @author: kostya
 '''
-from delicious.main import start
+from fastlink.main import start
 
 def main():
     start()  

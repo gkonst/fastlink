@@ -8,11 +8,11 @@ import tkFont
 import webbrowser
 import sys
 
-from delicious.core.cache import Cache
-from delicious.core.util import log
-from delicious.tkinter.login import Login
-from delicious.tkinter.widget import ZListBox, ZEntry
-from delicious.core.config import config   
+from fastlink.core.cache import Cache
+from fastlink.core.util import log
+from fastlink.tkinter.login import Login
+from fastlink.tkinter.widget import ZListBox, ZEntry
+from fastlink.core.config import config   
 
 def start_ui():
     root = Tk()

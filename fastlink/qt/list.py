@@ -11,13 +11,13 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QMainWindow, QApplication
 from PyQt4.QtCore import pyqtSignature
 
-from delicious.core.cache import Cache
-from delicious.core.util import log
-from delicious.core.config import config
-from delicious.core.common import *
-from delicious.qt.login import Login 
+from fastlink.core.cache import Cache
+from fastlink.core.util import log
+from fastlink.core.config import config
+from fastlink.core.common import *
+from fastlink.qt.login import Login 
 
-from delicious.qt.Ui_list import Ui_BookmarkList
+from fastlink.qt.Ui_list import Ui_BookmarkList
 
 def start_ui():
     app = QApplication(sys.argv)

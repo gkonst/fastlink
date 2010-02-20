@@ -1,7 +1,7 @@
 import sqlite3
 
-from delicious.core.common import *
-from delicious.core.util import log
+from fastlink.core.common import *
+from fastlink.core.util import log
 
 class DAO(object):
     

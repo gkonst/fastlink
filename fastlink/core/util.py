@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-#    qsmile/core/util.py
+#    fastlink/core/util.py
 #
-#    Copyright (C) 2008 Konstantin Grigoriev
+#    Copyright (C) 2010 Konstantin Grigoriev
 #
-#    This file is part of qsmile.
+#    This file is part of fastlink.
 #    
 #    qsmile is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="[%(levelname)-1s] %(asctime)s %(module)s:%(funcName)s:%(lineno)d - %(message)s"
 )
-log = logging.getLogger("delicious") 
+log = logging.getLogger("fastlink") 
 
 def timing(func):
     def timing(*arg):

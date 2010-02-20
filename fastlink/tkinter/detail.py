@@ -7,12 +7,12 @@ import sys, os
 from Tkinter import *
 from threading import Thread
 
-from delicious.tkinter.widget import ZEntry, ZSplashScreen, center_on_screen
-from delicious.core.cache import Cache, SaveException
-from delicious.core.util import log
-from delicious.core.common import get_title
-from delicious.tkinter.login import Login
-from delicious.core.config import config 
+from fastlink.tkinter.widget import ZEntry, ZSplashScreen, center_on_screen
+from fastlink.core.cache import Cache, SaveException
+from fastlink.core.util import log
+from fastlink.core.common import get_title
+from fastlink.tkinter.login import Login
+from fastlink.core.config import config 
 
 def start_ui():
     root = Tk()
@@ -84,7 +84,7 @@ class BookmarkDetail(Frame):
             self.url["state"] = NORMAL
 
     def save_post(self):
-        splash = ZSplashScreen(self, image_file=os.path.join(sys.path[0], 'delicious/images/spinner_%d.gif'))
+        splash = ZSplashScreen(self, image_file=os.path.join(sys.path[0], 'fastlink/images/spinner_%d.gif'))
         Thread(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         splash.start_splash()
         

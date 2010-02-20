@@ -2,8 +2,8 @@ import sys
 
 from optparse import OptionParser
 
-from delicious.core.util import log
-from delicious.core.config import config
+from fastlink.core.util import log
+from fastlink.core.config import config
     
 class Delicious(object):
     def __init__(self):
@@ -35,14 +35,14 @@ class Delicious(object):
             sys.exit()
             
     def _import_tkinter(self):
-        import delicious.tkinter.list as list
-        import delicious.tkinter.detail as detail
+        import fastlink.tkinter.list as list
+        import fastlink.tkinter.detail as detail
         log.debug("Tkinter UI loaded")         
         return (list, detail)
 
     def _import_qt(self):
-        import delicious.qt.list as list
-        import delicious.qt.detail as detail
+        import fastlink.qt.list as list
+        import fastlink.qt.detail as detail
         log.debug("QT4 UI loaded")
         return (list, detail)
     

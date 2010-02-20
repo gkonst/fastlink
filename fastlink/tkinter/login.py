@@ -6,9 +6,9 @@ Created on Feb 22, 2009
 from Tkinter import *
 import tkMessageBox
 
-from delicious.tkinter.widget import ZDialog, ZEntry, ZPasswordEntry
-from delicious.core.util import log
-from delicious.core.config import config
+from fastlink.tkinter.widget import ZDialog, ZEntry, ZPasswordEntry
+from fastlink.core.util import log
+from fastlink.core.config import config
 
 class Login(ZDialog):
     def __init__(self, master=None):

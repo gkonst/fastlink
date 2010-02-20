@@ -9,10 +9,10 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QDialog, QApplication
 from PyQt4.QtCore import pyqtSignature
 
-from delicious.core.util import log
-from delicious.core.config import config 
+from fastlink.core.util import log
+from fastlink.core.config import config 
 
-from delicious.qt.Ui_login import Ui_Login
+from fastlink.qt.Ui_login import Ui_Login
 
 class Login(QDialog, Ui_Login):
     '''
