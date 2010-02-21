@@ -6,9 +6,7 @@ Contains custom **Tkinter** widgets.
 '''
 import os
 from functools import partial
-from multiprocessing import Queue
 from Tkinter import *
-import tkMessageBox
 
 class ZDialog(Toplevel):
 
@@ -261,55 +259,19 @@ class ZSplashScreen(Toplevel):
         self.grab_set()
         self.focus_set()
         
-        self._i = 0  
-        if image_file and os.path.exists(image_file % self._i):
-            # Use image if exist
-            # use Tkinter's PhotoImage for .gif files
-            image = PhotoImage(file=image_file % self._i)
-            self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
-            self.canvas.create_image(0, 0, anchor='nw', image=image)
-            self.canvas.pack()
-            self._image_file = image_file
-        else:
-            self._image_file = None
-            # Use text instead of image
-            Label(self, text='Working...').pack()   
-        center_on_screen(self)     
-        self.queue = Queue()
-        if timeout:
-            self.after(timeout, self.destroy_splash)
+        self._spinner = ZSpinner(self, image_file)   
+        center_on_screen(self)
 
-    def start_splash(self):
-        self._animate()
-        
-    def _animate(self):
-        if self._image_file:
-            if not os.path.exists(self._image_file % self._i):
-                self._i = 0
-            image = PhotoImage(file=self._image_file % self._i)
-            self.canvas.create_image(0, 0, anchor='nw', image=image)
-            self.canvas.update()  
-            self._i = self._i + 1
-        if self.queue.empty():
-            self.after_idle(self._animate)
-        else:
-            queue_message = self.queue.get()
-            if 'ERROR' in queue_message:
-                self.destroy_splash()
-                tkMessageBox.showerror('Error during saving', queue_message)            
-            else:
-                self.destroy_splash()
-                self.quit()               
+    def show(self, text=''):
+        self._spinner.show(text)
 
-    def destroy_splash(self):
+    def hide(self):
+        self._spinner.hide()
         # bring back main window and destroy splash screen
         self.master.update()
 #        self.main.deiconify()
         self.withdraw()
         self.destroy()
-        
-    def stop_splash(self):
-        self.queue.put('STOP')
 
 class ZStatusBar(Frame):
 
@@ -327,4 +289,4 @@ def center_on_screen(widget, width=None, height=None):
 
     x0 = xmax / 2 - width / 2
     y0 = ymax / 2 - height / 2
-    widget.winfo_toplevel().geometry("%dx%d+%d+%d" % (width, height, x0, y0))    
+    widget.winfo_toplevel().geometry("+%d+%d" % (x0, y0))    

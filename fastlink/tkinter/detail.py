@@ -4,17 +4,17 @@ Bookmark detail implementation using **Tkinter** library.
 
 .. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
 '''
-import os
 from Tkinter import *
 from threading import Thread
-from pkg_resources import resource_isdir, resource_filename
+import Queue
 
 from fastlink.tkinter.widget import ZEntry, ZSplashScreen, ZSuggestion, center_on_screen
 from fastlink.core.cache import Cache, SaveException
 from fastlink.core.util import log
 from fastlink.core.common import get_title
 from fastlink.tkinter.login import Login
-from fastlink.core.config import config 
+from fastlink.core.config import config
+from fastlink.tkinter import spinner_image 
 
 def start_ui():
     root = Tk()
@@ -88,15 +88,29 @@ class BookmarkDetail(Frame):
     def on_url_dbl_click(self, event):
         if self.url["state"] == DISABLED:
             self.url["state"] = NORMAL
+            
+    def _wait_for_save(self):
+        try:
+            while 1:
+                val = self.queue.get_nowait()
+                if 'ERROR' in val:
+                    self.splash.hide()
+                    import tkMessageBox
+                    tkMessageBox.showerror('Error during saving', val)            
+                else:
+                    self.splash.hide()
+                    self.update_idletasks()
+                    self.quit()
+        except Queue.Empty:
+            pass
+        self.after(100, self._wait_for_save)
 
     def save_post(self):
-        if resource_isdir('fastlink', 'images'):
-            image_file = os.path.join(resource_filename('fastlink', 'images'), 'spinner_%d.gif')
-        else:
-            image_file = None
-        splash = ZSplashScreen(self, image_file=image_file)
-        Thread(target=run, args=(self.cache, splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
-        splash.start_splash()
+        self.splash = ZSplashScreen(self, image_file=spinner_image)
+        self.queue = Queue.Queue()
+        self._wait_for_save()
+        Thread(target=run, args=(self.cache, self.queue, self.url.value(), self.title.value(), self.tags.value())).start()
+        self.splash.show('Saving...')
         
     def quit_handler(self, event):
         self.quit()
@@ -104,9 +118,7 @@ class BookmarkDetail(Frame):
 def run(cache, queue, url, title, tags):
     try:    
         cache.save_post(url, title, tags.strip())
-#        import time
-#        time.sleep(3)
         queue.put('STOP')
-    except SaveException, e:
+    except Exception, e:
         log.exception(e)
         queue.put('ERROR : %s' % e)

@@ -2,7 +2,7 @@ import time
 import os
 
 import fastlink.core.pydelicious as pydelicious
-from fastlink.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME, DeliciousItemExistsError
+from fastlink.core.pydelicious import DeliciousAPI, DLCS_WAIT_TIME, DeliciousError, DeliciousItemExistsError
 
 from fastlink.core.dao import DAO
 from fastlink.core.common import *
@@ -62,6 +62,8 @@ class Cache(object):
             self.api.posts_add(url=url, description=title, tags=tags)
         except DeliciousItemExistsError, url:
             raise SaveException('Item already exists : %s' % url)
+        except DeliciousError, message:
+            raise SaveException(message)
         last_added = self.api.posts_recent(count=1)['posts'][0]
         self.dao.save_post(last_added)
         self._update_last_sync()
