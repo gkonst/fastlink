@@ -109,15 +109,15 @@ class BookmarkDetail(Frame):
         self.splash = ZSplashScreen(self, image_file=spinner_image)
         self.queue = Queue.Queue()
         self._wait_for_save()
-        Thread(target=run, args=(self.cache, self.queue, self.url.value(), self.title.value(), self.tags.value())).start()
+        Thread(target=run, args=(self.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         self.splash.show('Saving...')
         
     def quit_handler(self, event):
         self.quit()
 
-def run(cache, queue, url, title, tags):
+def run(queue, url, title, tags):
     try:    
-        cache.save_post(url, title, tags.strip())
+        Cache().save_post(url, title, tags.strip())
         queue.put('STOP')
     except Exception, e:
         log.exception(e)
