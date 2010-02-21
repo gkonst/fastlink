@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Bookmark detail implementation using **Tkinter** library.
 

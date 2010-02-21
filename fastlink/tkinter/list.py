@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Bookmark list implementation using **Tkinter** library.
 
@@ -12,7 +13,8 @@ import Queue
 from fastlink.core.cache import Cache
 from fastlink.core.util import log
 from fastlink.tkinter.login import Login
-from fastlink.tkinter.widget import ZListBox, ZEntry
+from fastlink.tkinter.widget import ZListBox, ZEntry, ZStatusBar, ZSpinner
+from fastlink.tkinter import spinner_image
 from fastlink.core.config import config   
 
 def start_ui():
@@ -67,6 +69,7 @@ class BoormarkList(Frame):
     def start_cache_refresh(self):
         self.queue = Queue.Queue()
         self.refresh()
+        self.spinner.show('Synchronizing...')
         Thread(target=run_cache_refresh, args=(self.queue,)).start()
         
     def refresh(self):
@@ -76,6 +79,7 @@ class BoormarkList(Frame):
                 if val:
                     self.refresh_tags()
                     self.refresh_posts()
+                self.spinner.hide()
                 self.update_idletasks()
         except Queue.Empty:
             pass
@@ -91,13 +95,16 @@ class BoormarkList(Frame):
         self.tagList.grid(row=3, column=1, sticky=W)
         self.tagList.on_row_click(self.on_tag_clicked)
         #post list frame
-        self.postList = ZListBox(self, width=60, height=30)
+        self.postList = ZListBox(self, width=60, height=25)
         self.postList.grid(row=5, column=1, sticky=W)
         self.postList.on_row_click(self.tagList.clear_selection)
         self.postList.on_row_dbl_click(self.on_post_dbl_clicked)
-        #quit button
-        quitButton = Button(self, text="Quit", command=self.quit)
-        quitButton.grid(row=7, column=1)
+        #status bar
+        self.status = ZStatusBar(self.master)
+        self.status.grid(sticky=W+E)
+        #spinner
+        self.spinner = ZSpinner(self.status, spinner_image)
+        self.spinner.grid()
 
     def quit(self):
         if self.cache:

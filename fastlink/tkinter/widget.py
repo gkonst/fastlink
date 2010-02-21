@@ -199,7 +199,49 @@ class ZListBox(Frame):
         
     def on_row_click(self, func):
         self._list.bind("<<ListboxSelect>>", func)
-
+        
+class ZAnimatedImage(Canvas, object):
+    def __init__(self, master, image_file):
+        self._image_file = image_file
+        self._i = 0
+        image = PhotoImage(file=image_file % self._i)
+        super(ZAnimatedImage, self).__init__(master, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
+        
+    def show(self):
+        self._showed = True
+        self._animate()
+        
+    def hide(self):
+        self._showed = False
+        
+    def _animate(self):
+        if not os.path.exists(self._image_file % self._i):
+            self._i = 0
+        image = PhotoImage(file=self._image_file % self._i)
+        self.create_image(0, 0, anchor='nw', image=image)
+        self.update()  
+        self._i = self._i + 1
+        if self._showed:
+            self.after_idle(self._animate)
+            
+class ZSpinner(Frame, object):
+    def __init__(self, master, image_file):
+        super(ZSpinner, self).__init__(master)
+        self._image = ZAnimatedImage(master, image_file)
+        self._image.grid()
+        self._label_value = StringVar()
+        self._label = Label(master, textvariable=self._label_value)
+        self._label.grid(row=0,column=1)
+        
+    def show(self, text=''):
+        self._image.show()
+        self._label_value.set(text)
+        
+    def hide(self):
+        self._image.hide()
+        self._label_value.set('')
+        
+        
 class ZSplashScreen(Toplevel):
     '''
     A **Tkinter** splash screen (uses a GIF image file, does not need PIL).
@@ -219,17 +261,17 @@ class ZSplashScreen(Toplevel):
         self.grab_set()
         self.focus_set()
         
-        self.i = 0  
-        if image_file and os.path.exists(image_file % self.i):
+        self._i = 0  
+        if image_file and os.path.exists(image_file % self._i):
             # Use image if exist
             # use Tkinter's PhotoImage for .gif files
-            image = PhotoImage(file=image_file % self.i)
+            image = PhotoImage(file=image_file % self._i)
             self.canvas = Canvas(self, height=image.height(), width=image.width(), relief='raised', borderwidth=0)
             self.canvas.create_image(0, 0, anchor='nw', image=image)
             self.canvas.pack()
-            self.image_file = image_file
+            self._image_file = image_file
         else:
-            self.image_file = None
+            self._image_file = None
             # Use text instead of image
             Label(self, text='Working...').pack()   
         center_on_screen(self)     
@@ -241,13 +283,13 @@ class ZSplashScreen(Toplevel):
         self._animate()
         
     def _animate(self):
-        if self.image_file:
-            if not os.path.exists(self.image_file % self.i):
-                self.i = 0
-            image = PhotoImage(file=self.image_file % self.i)
+        if self._image_file:
+            if not os.path.exists(self._image_file % self._i):
+                self._i = 0
+            image = PhotoImage(file=self._image_file % self._i)
             self.canvas.create_image(0, 0, anchor='nw', image=image)
             self.canvas.update()  
-            self.i = self.i + 1
+            self._i = self._i + 1
         if self.queue.empty():
             self.after_idle(self._animate)
         else:
@@ -268,6 +310,11 @@ class ZSplashScreen(Toplevel):
         
     def stop_splash(self):
         self.queue.put('STOP')
+
+class ZStatusBar(Frame):
+
+    def __init__(self, master):
+        Frame.__init__(self, master, bd=1, relief=SUNKEN)
        
 def center_on_screen(widget, width=None, height=None):
     if not width or not height:
