@@ -9,7 +9,9 @@ import ConfigParser
 
 from fastlink.core.util import log
 
-APP_HOME_DIR = os.path.join(os.path.expanduser("~"), ".fastlink")
+APP_HOME_DIR = os.path.join(os.path.expanduser('~'), '.fastlink')
+if not os.path.exists(APP_HOME_DIR):
+    os.mkdir(APP_HOME_DIR)
     
 
 class LazyConfig(object):
