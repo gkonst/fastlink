@@ -5,6 +5,7 @@ Contains custom **Tkinter** widgets.
 .. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
 '''
 import os
+from functools import partial
 from multiprocessing import Queue
 from Tkinter import *
 import tkMessageBox
@@ -99,12 +100,73 @@ class ZEntry(Frame):
     def add_listener(self, action, listener):
         self._entry.bind(action, listener)
         
+    def remove_listener(self, action):
+        self._entry.unbind_all(action)
+        
     def focus(self):
         self._entry.focus_set()
         
 class ZPasswordEntry(ZEntry):
     def __init__(self, master=None, label="", value="", **kw):
         ZEntry.__init__(self, master, label=label, value=value, show="*", **kw)
+        
+class ZSuggestion(Menu, object):
+    
+    def __init__(self, entry, multi=False):
+        super(ZSuggestion, self).__init__(entry._entry.winfo_toplevel(), tearoff=0)
+        self.entry = entry
+        self.entry.add_listener('<KeyRelease>', self.show)
+        self.find_func = None
+        self.multi = multi
+        
+    def set_find_func(self, find_func):
+        self.find_func = find_func
+        
+    def show(self, event):
+        if not self.find_func:
+            raise ValueError('find_func must be setted before show')
+        self.hide()
+        if event.char and event.char.strip() and self.fill():
+            x = self.entry._entry.winfo_rootx() + 7*self.entry._entry.index(INSERT)
+            y = self.entry._entry.winfo_rooty() + self.entry._entry.winfo_height()
+            self.post(x, y)
+            self.entry.add_listener('<Down>', self.focus)
+            self.entry.add_listener('<FocusOut>', self.hide)
+        
+    def fill(self):
+        if self.multi:
+            entered = self.entry.value().split(' ')
+        else:
+            entered = (self.entry.value(),)
+        if entered and entered[-1]:
+            suggestions = self.find_func(entered[-1])
+            for suggest in suggestions:
+                self.add_command(label=suggest, command=partial(self._select_suggestion, suggest))
+            return suggestions
+            
+    def focus(self, event=None):
+        super(ZSuggestion, self).focus_set()
+        self.activate(0)
+        
+    def hide(self, event=None):
+        if not self==self.focus_get(): 
+            self.unpost()
+            self.entry.remove_listener('<Down>')
+            self.entry.remove_listener('<FocusOut>')
+            self.delete(0, END)
+        
+    def _select_suggestion(self, suggestion):
+        if isinstance(suggestion, tuple):
+            suggestion = suggestion[0]
+        if self.multi:
+            prev = ' '.join(self.entry.value().split(' ')[0:-1])
+            if prev:
+                prev = prev + ' '
+            self.entry.value(prev + suggestion + ' ')
+        else:
+            self.entry.value(suggestion)
+        self.entry._entry.icursor(END)
+        self.entry.focus()
         
 class ZListBox(Frame):
     def __init__(self, master=None, **kw):

@@ -3,12 +3,12 @@ Bookmark detail implementation using **Tkinter** library.
 
 .. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
 '''
-import sys, os
+import os
 from Tkinter import *
 from threading import Thread
 from pkg_resources import resource_isdir, resource_filename
 
-from fastlink.tkinter.widget import ZEntry, ZSplashScreen, center_on_screen
+from fastlink.tkinter.widget import ZEntry, ZSplashScreen, ZSuggestion, center_on_screen
 from fastlink.core.cache import Cache, SaveException
 from fastlink.core.util import log
 from fastlink.core.common import get_title
@@ -55,7 +55,9 @@ class BookmarkDetail(Frame):
     def fill(self):
         self.winfo_toplevel().title("Delicious bookmarks : %s : save a bookmark" % config.username)
         self.winfo_toplevel().bind("<Escape>", self.quit_handler)
-        
+        self.cache = Cache()
+        self.tags_suggest.set_find_func(self.cache.find_tags)
+
     def create_widgets(self):
         clipboard = self.selection_get(selection="CLIPBOARD")
         log.debug(" detecting clipboard : %s", clipboard)
@@ -71,6 +73,7 @@ class BookmarkDetail(Frame):
         self.tags = ZEntry(self, label="Tags : ", width=50)
         self.tags.grid(row=5, column=1)
         self.tags.focus()
+
         box = Frame(self)
         w = Button(box, text="Save", command=self.save_post, width=10, default=ACTIVE)
         w.pack(side=LEFT, padx=5, pady=5)
@@ -79,6 +82,7 @@ class BookmarkDetail(Frame):
         self.bind("<Return>", self.save_post)
         self.bind("<Escape>", self.quit)
         box.grid(row=7, column=1)
+        self.tags_suggest = ZSuggestion(self.tags, multi=True)
                 
     def on_url_dbl_click(self, event):
         if self.url["state"] == DISABLED:
@@ -90,16 +94,15 @@ class BookmarkDetail(Frame):
         else:
             image_file = None
         splash = ZSplashScreen(self, image_file=image_file)
-        Thread(target=run, args=(splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
+        Thread(target=run, args=(self.cache, splash.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         splash.start_splash()
         
     def quit_handler(self, event):
         self.quit()
 
-def run(queue, url, title, tags):
-    cache = Cache()
+def run(cache, queue, url, title, tags):
     try:    
-        cache.save_post(url, title, tags)
+        cache.save_post(url, title, tags.strip())
 #        import time
 #        time.sleep(3)
         queue.put('STOP')
