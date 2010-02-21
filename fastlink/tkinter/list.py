@@ -118,8 +118,11 @@ class BoormarkList(Frame):
         tags = self.cache.find_tags(tag)
         self.tagList.set_data(tags, lambda item: item[0])
         
-    def refresh_posts(self, tag="", exact=False):
-        self.posts = self.cache.find_posts_by_tag(tag, exact)
+    def refresh_posts(self, pattern="", exact=False):
+        if exact:
+            self.posts = self.cache.find_posts_by_tag(pattern, exact)
+        else:
+            self.posts = self.cache.find_posts_by_pattern(pattern)
         self.postList.set_data(self.posts, lambda item: item[0])       
     
     def on_search_changed(self, event):
@@ -128,7 +131,7 @@ class BoormarkList(Frame):
         
     def on_tag_clicked(self, event):
         tag = self.tagList.get_current_row()
-        self.refresh_posts(tag)
+        self.refresh_posts(tag, exact=True)
         
     def on_post_dbl_clicked(self, event):
         index = self.postList.get_current_index()

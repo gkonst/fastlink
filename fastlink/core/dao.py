@@ -1,10 +1,19 @@
+# -*- coding: utf-8 -*-
+'''
+Contains **DAO** class to work with DB.
+
+.. moduleauthor:: Konstantin_Grigoriev <Konstantin.V.Grigoriev@gmail.com>
+'''
 import sqlite3
 
 from fastlink.core.common import *
 from fastlink.core.util import log
 
 class DAO(object):
-    
+    '''
+    Basic class for working with DB. Works with SQLite DB, but base abstract class
+    can be extracted and another implementations can be implemented.
+    '''
     def __init__(self, database):
         log.debug(" opening database...%s", database)
         self.conn = sqlite3.connect(database)
@@ -150,7 +159,7 @@ class DAO(object):
         self._update_tags_for_post(post['tag'].split())
         c = self.conn.cursor()
         try:
-             c.execute("""INSERT OR REPLACE INTO POST(URL, 
+            c.execute("""INSERT OR REPLACE INTO POST(URL, 
                                                       TITLE, 
                                                       NOTES,
                                                       TAG,
@@ -162,7 +171,7 @@ class DAO(object):
                                                        :tag,
                                                        :hash,
                                                        :time)""", post)           
-             self.conn.commit()
+            self.conn.commit()
         finally:
             c.close() 
         log.debug("saving post...Ok")
@@ -201,13 +210,33 @@ class DAO(object):
         log.debug("getting posts by tag...Ok(%s found)", len(result))
         return result
     
+    def find_posts_by_pattern(self, pattern, order):
+        log.debug("getting posts by pattern %s...", pattern)
+        if order == ORDER_POSTS_URL:
+            sort = "p.url"
+        elif order == ORDER_POSTS_TITLE:
+            sort = "p.title"
+        else:
+            sort = "p.timestamp desc"
+        if pattern:
+            any_pattern = '%' + pattern + '%'
+            result = self._fetchall("""SELECT p.title, p.url, p.tag FROM POST p WHERE p.tag LIKE ? OR
+            p.title LIKE ? or p.url LIKE ? ORDER BY """ + sort, (any_pattern, any_pattern, any_pattern))
+        else:
+            result = self._fetchall("""SELECT p.title, p.url, p.tag FROM POST p ORDER BY """ + sort)
+        log.debug("getting posts by pattern...Ok(%s found)", len(result))
+        return result
+    
     def find_tags(self, pattern, order):
         log.debug("getting tags...%s, order : %s", pattern, order)
         if order == ORDER_TAGS_COUNT:
             sort = "t.count desc"
         else: 
             sort = "t.name"
-        result = self._fetchall('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY ' + sort, (pattern + '%',))
+        if pattern:
+            result = self._fetchall('SELECT t.name FROM TAG t WHERE t.name LIKE ? ORDER BY ' + sort, (pattern + '%',))
+        else:
+            result = self._fetchall('SELECT t.name FROM TAG t ORDER BY ' + sort)
         log.debug("getting tags...Ok(%s found)", len(result))
         return result
     
@@ -220,7 +249,7 @@ class DAO(object):
             c.close()
         return result   
 
-    def _fetchall(self, query, params):
+    def _fetchall(self, query, params=()):
         c = self.conn.cursor()
         try:
             log.debug(" executing query : %s", query)
