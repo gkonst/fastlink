@@ -22,7 +22,6 @@ class Cache(object):
         pydelicious.DEBUG = 0
         pydelicious.Waiter = _FileWaiter(DLCS_WAIT_TIME, os.path.join(config.config_dir, "pydelicious.stamp"))       
         self.api = DeliciousAPI(config.username, config.password)
-        self.refresh()
         log.debug("opening cache...Ok")
     
     def refresh(self):
@@ -45,6 +44,8 @@ class Cache(object):
                 self.dao.update_posts(posts)
                 self.dao.update_last_update(last_update)              
                 log.debug("refreshing cache...Ok")
+                return True
+        return False
         
     def _update_last_sync(self):
         self.dao.update_last_sync(time.time())

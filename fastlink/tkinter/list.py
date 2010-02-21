@@ -6,7 +6,8 @@ Bookmark list implementation using **Tkinter** library.
 from Tkinter import *
 import tkFont
 import webbrowser
-import sys
+from threading import Thread
+import Queue
 
 from fastlink.core.cache import Cache
 from fastlink.core.util import log
@@ -24,12 +25,15 @@ def start_ui():
 #            pass
     BoormarkList(root)
     root.mainloop()
+    
+def run_cache_refresh(queue):
+    queue.put(Cache().refresh())
 
 class BoormarkList(Frame):
 
     def __init__(self, master=None):
         Frame.__init__(self, master)
-        self.winfo_toplevel().title("Delicious bookmarks")
+        self.winfo_toplevel().title("Fastlink bookmarks")
         self.winfo_toplevel().bind("<Escape>", self.quit_handler)
         self.grid()
         self.grid_rowconfigure(0, weight=0, minsize=10, pad=0)
@@ -54,10 +58,28 @@ class BoormarkList(Frame):
             self.fill()
     
     def fill(self):
-        self.winfo_toplevel().title("Delicious bookmarks : %s" % config.username)
+        self.winfo_toplevel().title('Fastlink bookmarks : %s' % config.username)
         self.cache = Cache()
         self.refresh_tags()
-        self.refresh_posts()                
+        self.refresh_posts()  
+        self.start_cache_refresh()
+        
+    def start_cache_refresh(self):
+        self.queue = Queue.Queue()
+        self.refresh()
+        Thread(target=run_cache_refresh, args=(self.queue,)).start()
+        
+    def refresh(self):
+        try:
+            while 1:
+                val = self.queue.get_nowait()
+                if val:
+                    self.refresh_tags()
+                    self.refresh_posts()
+                self.update_idletasks()
+        except Queue.Empty:
+            pass
+        self.after(100, self.refresh)
 
     def createWidgets(self):
         self.search = ZEntry(self)

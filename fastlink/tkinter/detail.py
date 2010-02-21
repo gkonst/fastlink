@@ -29,7 +29,7 @@ def start_ui():
 class BookmarkDetail(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
-        self.winfo_toplevel().title("Delicious bookmarks: save a bookmark")
+        self.winfo_toplevel().title('Fastlink bookmarks: save a bookmark')
         self.grid()
         self.grid_rowconfigure(0, weight=0, minsize=10, pad=0)
         self.grid_rowconfigure(2, weight=0, minsize=10, pad=0)
@@ -53,7 +53,7 @@ class BookmarkDetail(Frame):
             self.fill()
             
     def fill(self):
-        self.winfo_toplevel().title("Delicious bookmarks : %s : save a bookmark" % config.username)
+        self.winfo_toplevel().title('Fastlink bookmarks : %s : save a bookmark' % config.username)
         self.winfo_toplevel().bind("<Escape>", self.quit_handler)
         self.cache = Cache()
         self.tags_suggest.set_find_func(self.cache.find_tags)
