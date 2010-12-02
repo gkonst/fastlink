@@ -60,7 +60,10 @@ class BookmarkDetail(Frame):
         self.tags_suggest.set_find_func(self.cache.find_tags)
 
     def create_widgets(self):
-        clipboard = self.selection_get(selection="CLIPBOARD")
+        try:
+            clipboard = self.selection_get(selection="CLIPBOARD")
+        except TclError:
+            clipboard = ''
         log.debug(" detecting clipboard : %s", clipboard)
         if clipboard.startswith("http://"):
             self.url = ZEntry(self, label="Url : ", value=clipboard, width=50, state=DISABLED)
