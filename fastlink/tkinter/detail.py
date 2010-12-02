@@ -14,7 +14,7 @@ from fastlink.core.util import log
 from fastlink.core.common import get_title
 from fastlink.tkinter.login import Login
 from fastlink.core.config import config
-from fastlink.tkinter import spinner_image 
+from fastlink.tkinter import spinner_image
 
 def start_ui():
     root = Tk()
@@ -42,7 +42,7 @@ class BookmarkDetail(Frame):
         self.create_widgets()
         self.after_idle(center_on_screen, self)
         self.login()
-        
+
     def login(self):
         if not config.username or not config.password:
             Login(self)
@@ -52,7 +52,7 @@ class BookmarkDetail(Frame):
                 sys.exit()
         else:
             self.fill()
-            
+
     def fill(self):
         self.winfo_toplevel().title('Fastlink bookmarks : %s : save a bookmark' % config.username)
         self.winfo_toplevel().bind("<Escape>", self.quit_handler)
@@ -67,7 +67,7 @@ class BookmarkDetail(Frame):
             self.title = ZEntry(self, label="Title : ", value=get_title(clipboard), width=50)
         else:
             self.url = ZEntry(self, label="Url : ", width=50)
-            self.title = ZEntry(self, label="Title : ", width=50)           
+            self.title = ZEntry(self, label="Title : ", width=50)
         self.url.add_listener("<Double-Button-1>", self.on_url_dbl_click)
         self.url.grid(row=1, column=1)
         self.title.grid(row=3, column=1)
@@ -80,15 +80,14 @@ class BookmarkDetail(Frame):
         w.pack(side=LEFT, padx=5, pady=5)
         w = Button(box, text="Cancel", command=self.quit, width=10)
         w.pack(side=LEFT, padx=5, pady=5)
-        self.bind("<Return>", self.save_post)
-        self.bind("<Escape>", self.quit)
+        self.winfo_toplevel().bind("<Return>", self.save_post)
         box.grid(row=7, column=1)
         self.tags_suggest = ZSuggestion(self.tags, multi=True)
-                
+
     def on_url_dbl_click(self, event):
         if self.url["state"] == DISABLED:
             self.url["state"] = NORMAL
-            
+
     def _wait_for_save(self):
         try:
             while 1:
@@ -96,7 +95,7 @@ class BookmarkDetail(Frame):
                 if 'ERROR' in val:
                     self.splash.hide()
                     import tkMessageBox
-                    tkMessageBox.showerror('Error during saving', val)            
+                    tkMessageBox.showerror('Error during saving', val)
                 else:
                     self.splash.hide()
                     self.update_idletasks()
@@ -105,18 +104,18 @@ class BookmarkDetail(Frame):
             pass
         self.after(100, self._wait_for_save)
 
-    def save_post(self):
+    def save_post(self, event=None):
         self.splash = ZSplashScreen(self, image_file=spinner_image)
         self.queue = Queue.Queue()
         self._wait_for_save()
         Thread(target=run, args=(self.queue, self.url.value(), self.title.value(), self.tags.value())).start()
         self.splash.show('Saving...')
-        
+
     def quit_handler(self, event):
         self.quit()
 
 def run(queue, url, title, tags):
-    try:    
+    try:
         Cache().save_post(url, title, tags.strip())
         queue.put('STOP')
     except Exception, e:
